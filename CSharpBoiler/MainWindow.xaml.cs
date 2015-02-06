@@ -207,7 +207,7 @@ namespace CSharpBoiler
 
         #endregion
 
-        private void DemoAnalyseButton_Click(object sender, RoutedEventArgs e)
+        private void DemoAnalyzeButton_Click(object sender, RoutedEventArgs e)
         {
             string url = ((Button)sender).Tag.ToString();
             DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(GetMatchData(url), steamID);

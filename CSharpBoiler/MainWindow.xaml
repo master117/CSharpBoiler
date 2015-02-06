@@ -71,7 +71,7 @@
                                 <DataTemplate>
                                     <DockPanel>
                                         <Button x:Name="DemoDownloadButton" Content="{Binding Demo}" Click="DemoDownloadButton_Click" />
-                                        <Button x:Name="DemoAnalyseButton" Content="Analyse" Tag="{Binding Demo}" Background="LightGray" Click="DemoAnalyseButton_Click" />
+                                        <Button x:Name="DemoAnalyzeButton" Content="Analyze" Tag="{Binding Demo}" Background="LightGray" Click="DemoAnalyzeButton_Click" />
                                         <ProgressBar x:Name="DemoButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress}" Width="100" Margin="5,0,0,0" />
                                     </DockPanel>
                                 </DataTemplate>
