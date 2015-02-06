@@ -19,6 +19,11 @@ namespace CSharpBoiler
         public double KD { get; set; }
         public string Demo { get; set; }
         public bool Won { get; set; }
+        public bool Downloaded { get; set; }
         public string DemoComment { get; set; }
+        public int HS { get; set; }
+        public int K3 { get; set; }
+        public int K4 { get; set; }
+        public int K5 { get; set; }
     }
 }

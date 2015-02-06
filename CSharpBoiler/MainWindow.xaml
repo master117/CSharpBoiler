@@ -14,6 +14,13 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="{x:Type Button}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Downloaded}" Value="True">
+                    <Setter Property="Background" Value="LightGreen" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -62,7 +69,8 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <DockPanel>
-                                        <Button x:Name="DemoButtonTemp" Content="{Binding Demo}" Click="DemoButton_Click" />
+                                        <Button x:Name="DemoDownloadButton" Content="{Binding Demo}" Click="DemoDownloadButton_Click" />
+                                        <Button x:Name="DemoAnalyseButton" Content="Analyse" Tag="{Binding Demo}" Background="LightGray" Click="DemoAnalyseButton_Click" />
                                         <ProgressBar x:Name="DemoButtonProgressbar" Width="100" Margin="5,0,0,0" />
                                     </DockPanel>
                                 </DataTemplate>
@@ -73,11 +81,22 @@
                                 x:Name="DemoCommentGridViewColumn">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment}"></TextBox>
+                                    <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-
+                        <GridViewColumn Header="3Ks"
+                                DisplayMemberBinding="{Binding K3}"
+                                util:GridViewSort.PropertyName="K3"
+                                x:Name="K3GridViewColumn" />
+                        <GridViewColumn Header="4Ks"
+                                DisplayMemberBinding="{Binding K4}"
+                                util:GridViewSort.PropertyName="K4"
+                                x:Name="K4GridViewColumn" />
+                        <GridViewColumn Header="5Ks"
+                                DisplayMemberBinding="{Binding K5}"
+                                util:GridViewSort.PropertyName="K5"
+                                x:Name="K5GridViewColumn" />
                     </GridView.Columns>
                 </GridView>
             </ListView.View>

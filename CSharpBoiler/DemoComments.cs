@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,11 +9,10 @@ using System.Threading.Tasks;
 namespace CSharpBoiler
 {
     [Serializable]
-    public class DemoComments
+    public class AdditionalDemoData
     {
         //Key = DemoName, Value = DemoComment
-
-        private SerializableDictionary<string, string> DemoCommentDictionary = new SerializableDictionary<string, string>();
+        public SerializableDictionary<string, string> DemoCommentDictionary = new SerializableDictionary<string, string>();
 
         public void AddComment(string key, string value)
         {

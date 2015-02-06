@@ -29,7 +29,8 @@ namespace CSharpBoiler
     public partial class MainWindow : Window
     {
         private List<MatchData> matchDataList = new List<MatchData>();
-        private DemoComments demoComments = new DemoComments();
+        private AdditionalDemoData demoComments = new AdditionalDemoData();
+        private string steamID;
 
         public MainWindow()
         {
@@ -41,35 +42,23 @@ namespace CSharpBoiler
             MainListView.ItemsSource = matchDataList;
 
             //DemoCommentsDeserialization
-            if (File.Exists("DemoComments.xml"))
+            if (Directory.Exists("Demos"))
             {
-                System.Xml.Serialization.XmlSerializer xmlReader =
-                new System.Xml.Serialization.XmlSerializer(typeof(DemoComments));
-                System.IO.StreamReader streamReader = new System.IO.StreamReader(
-                    "DemoComments.xml");
-                demoComments = (DemoComments)xmlReader.Deserialize(streamReader);
+                if (File.Exists("Demos/AdditionalDemoData.xml"))
+                {
+                    System.Xml.Serialization.XmlSerializer xmlReader =
+                    new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
+                    System.IO.StreamReader streamReader = new System.IO.StreamReader(
+                        "Demos/AdditionalDemoData.xml");
+                    demoComments = (AdditionalDemoData)xmlReader.Deserialize(streamReader);
+
+                    streamReader.Close();
+                }
             }
 
+            //UpdateMatchList
             FillInData();
         }
-
-        public void FillInData()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "dat files (*.dat)|*.dat";
-            openFileDialog.ShowDialog();
-            FileStream dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
-            string steamID = openFileDialog.SafeFileName.Split('_')[0];
-
-            CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
-            CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
-
-            ParseMatchData(matchlist, steamID);
-
-            matchDataList.Reverse();
-            ColorDownloadedDemos();
-        }
-
 
         public void UpdateMatchList()
         {
@@ -79,8 +68,23 @@ namespace CSharpBoiler
             boilerProcess.Close();
         }
 
+        public void FillInData()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "dat files (*.dat)|*.dat";
+            openFileDialog.ShowDialog();
+            FileStream dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
+            steamID = openFileDialog.SafeFileName.Split('_')[0];
 
+            CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
+            CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
 
+            ParseMatchData(matchlist, steamID);
+
+            matchDataList.Reverse();
+        }
+
+        #region MatchData Parrsing
         //
         // Databinding of the Table
         //
@@ -103,7 +107,7 @@ namespace CSharpBoiler
                     if (matchlist.GetMatches(i).Roundstats.Reservation.GetAccountIds(j).ToString() == steamID)
                         break;
                 }
-                //Kills, Assists, Deaths, MVP, Score
+                //Kills, Assists, Deaths, MVP, Score, KD, Demo
                 matchData.Kills = matchlist.GetMatches(i).Roundstats.GetKills(j);
                 matchData.Assists = matchlist.GetMatches(i).Roundstats.GetAssists(j);
                 matchData.Deaths = matchlist.GetMatches(i).Roundstats.GetDeaths(j);
@@ -111,6 +115,7 @@ namespace CSharpBoiler
                 matchData.Score = matchlist.GetMatches(i).Roundstats.GetScores(j);
                 matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths)*100))/100);
                 matchData.Demo = matchlist.GetMatches(i).Roundstats.Map; //new DemoButtonUserControl(matchlist.GetMatches(i).Roundstats.Map);
+                //Getting DemoComment
                 if (demoComments.Contains(matchData.Demo))
                 {
                     matchData.DemoComment = demoComments.Get(matchData.Demo);
@@ -120,7 +125,11 @@ namespace CSharpBoiler
                 //Calculating if we won the match
                 matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(0) > matchlist.GetMatches(i).Roundstats.GetTeamScores(1) && j < (double)matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2
                                 || matchlist.GetMatches(i).Roundstats.GetTeamScores(0) < matchlist.GetMatches(i).Roundstats.GetTeamScores(1) && j > (double)matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2);
-                     
+                 
+                //Calculating if we downloaded the Demo
+                string[] tempURLSplit = matchData.Demo.Split('/');
+                string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                matchData.Downloaded = (File.Exists("Demos/" + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
 
                 //adding to the MainList of MatchData
                 matchDataList.Add(matchData);
@@ -135,25 +144,14 @@ namespace CSharpBoiler
             return dtDateTime;
         }
 
+        #endregion
+
         #region DemoDownload
         /// 
         /// Demo Download Section
         /// 
 
-        public void ColorDownloadedDemos()
-        {
-            foreach(MatchData tempMatchData in MainListView.Items)
-            {
-                string[] tempURLSplit = tempMatchData.Demo.Split('/');
-                string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                if (File.Exists("Demos/" + tempDemoFileName))
-                {
-                    //MainListView
-                }
-            }
-        }
-
-        private void DemoButton_Click(object sender, RoutedEventArgs e)
+        private void DemoDownloadButton_Click(object sender, RoutedEventArgs e)
         {
             Button tempButton = (Button)sender;
             string URL = (string)tempButton.Content;
@@ -185,7 +183,6 @@ namespace CSharpBoiler
 
         private void Completed(object sender, AsyncCompletedEventArgs e)
         {
-            ColorDownloadedDemos();
             unzipDemos();
             MessageBox.Show("Download completed! Unzipping completed!");
         }
@@ -209,34 +206,47 @@ namespace CSharpBoiler
 
         #endregion
 
+        private void DemoAnalyseButton_Click(object sender, RoutedEventArgs e)
+        {
+            string url = ((Button)sender).Tag.ToString();
 
+            foreach(var matchData in matchDataList)
+            {
+                if(matchData.Demo == url)
+                {
+                    DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(matchData, steamID);
+                    tempDemoAnalyzer.Analyze();
+                    break;
+                }
+            }           
+        }
+
+        #region Closing & Demo Comment Serialization
         //
-        // Demo Comment Serialization
+        // Closing & Demo Comment Serialization
         //
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //DemoCommentsSerialization
-            ExtractDemoComments();
+            ExtractAdditionalDemoData();
+
+            if (!Directory.Exists("Demos"))
+                Directory.CreateDirectory("Demos");
 
             System.Xml.Serialization.XmlSerializer xmlWriter =
-            new System.Xml.Serialization.XmlSerializer(typeof(DemoComments));
+            new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
 
             System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(
-            "DemoComments.xml");
+            "Demos/AdditionalDemoData.xml");
             xmlWriter.Serialize(streamWriter, demoComments);
 
             streamWriter.Close();
         }
 
-        private void ExtractDemoComments()
+        private void ExtractAdditionalDemoData()
         {
-            foreach(var a in MainGridView.Columns)
-            {
-                
-            }
-
-            foreach (MatchData tempMatchData in MainListView.Items)
+            foreach (MatchData tempMatchData in matchDataList)
             {
                 if(tempMatchData.DemoComment != null)
                 {
@@ -244,5 +254,8 @@ namespace CSharpBoiler
                 }
             }
         }
+        #endregion
+
+
     }
 }
