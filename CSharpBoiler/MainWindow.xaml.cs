@@ -20,6 +20,7 @@ using Microsoft.Win32;
 using System.Net;
 using System.ComponentModel;
 using ICSharpCode.SharpZipLib.BZip2;
+using System.Collections.ObjectModel;
 
 namespace CSharpBoiler
 {
@@ -28,7 +29,7 @@ namespace CSharpBoiler
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<MatchData> matchDataList = new List<MatchData>();
+        private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
         private AdditionalDemoData demoComments = new AdditionalDemoData();
         private string steamID;
 
@@ -209,16 +210,20 @@ namespace CSharpBoiler
         private void DemoAnalyseButton_Click(object sender, RoutedEventArgs e)
         {
             string url = ((Button)sender).Tag.ToString();
+            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(GetMatchData(url), steamID);
+            tempDemoAnalyzer.Analyze();
 
+            MessageBox.Show("Analysis completed!");
+        }
+
+        public MatchData GetMatchData(string demoURL)
+        { 
             foreach(var matchData in matchDataList)
             {
-                if(matchData.Demo == url)
-                {
-                    DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(matchData, steamID);
-                    tempDemoAnalyzer.Analyze();
-                    break;
-                }
-            }           
+                if(matchData.Demo == demoURL)
+                    return matchData;
+            }
+            return null;
         }
 
         #region Closing & Demo Comment Serialization

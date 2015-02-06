@@ -69,7 +69,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DemoAnalyzer.cs" />
-    <Compile Include="DemoComments.cs" />
+    <Compile Include="AdditionalDemoData.cs" />
     <Compile Include="GridViewSort.cs" />
     <Compile Include="MatchData.cs" />
     <Compile Include="protoCS\BaseGcmessages.cs" />

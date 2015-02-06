@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:util="clr-namespace:Wpf.Util"
-        Title="MainWindow" Loaded="Window_Loaded" Closing="Window_Closing" Height="Auto" Width="Auto">
+        Title="MainWindow" Loaded="Window_Loaded" Closing="Window_Closing" Height="Auto" Width="Auto"
+        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <Style TargetType="{x:Type ListViewItem}">
             <Style.Triggers>
@@ -24,7 +25,7 @@
     </Window.Resources>
 
     <Grid>
-        <ListView ItemsSource="{Binding matchDataList}"
+        <ListView
       IsSynchronizedWithCurrentItem="True"
       util:GridViewSort.AutoSort="True"
       x:Name="MainListView" >
@@ -71,7 +72,7 @@
                                     <DockPanel>
                                         <Button x:Name="DemoDownloadButton" Content="{Binding Demo}" Click="DemoDownloadButton_Click" />
                                         <Button x:Name="DemoAnalyseButton" Content="Analyse" Tag="{Binding Demo}" Background="LightGray" Click="DemoAnalyseButton_Click" />
-                                        <ProgressBar x:Name="DemoButtonProgressbar" Width="100" Margin="5,0,0,0" />
+                                        <ProgressBar x:Name="DemoButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress}" Width="100" Margin="5,0,0,0" />
                                     </DockPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -97,6 +98,10 @@
                                 DisplayMemberBinding="{Binding K5}"
                                 util:GridViewSort.PropertyName="K5"
                                 x:Name="K5GridViewColumn" />
+                        <GridViewColumn Header="HS%"
+                                DisplayMemberBinding="{Binding HS}"
+                                util:GridViewSort.PropertyName="HS"
+                                x:Name="HSGridViewColumn" />
                     </GridView.Columns>
                 </GridView>
             </ListView.View>
