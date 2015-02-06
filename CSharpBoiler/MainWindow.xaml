@@ -1,0 +1,86 @@
+﻿<Window x:Class="CSharpBoiler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:util="clr-namespace:Wpf.Util"
+        Title="MainWindow" Loaded="Window_Loaded" Closing="Window_Closing" Height="Auto" Width="Auto">
+    <Window.Resources>
+        <Style TargetType="{x:Type ListViewItem}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Won}" Value="False">
+                    <Setter Property="Background" Value="Red" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Won}" Value="True">
+                    <Setter Property="Background" Value="LightGreen" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <ListView ItemsSource="{Binding matchDataList}"
+      IsSynchronizedWithCurrentItem="True"
+      util:GridViewSort.AutoSort="True"
+      x:Name="MainListView" >
+            <ListView.View>
+                <GridView x:Name="MainGridView">
+                    <GridView.Columns>
+                        <GridViewColumn Header="Date"
+                                DisplayMemberBinding="{Binding Date}"
+                                util:GridViewSort.PropertyName="Date"
+                                x:Name="DateGridViewColumn"/>
+                        <GridViewColumn Header="Result"
+                                DisplayMemberBinding="{Binding Result}"
+                                util:GridViewSort.PropertyName="Result"
+                                x:Name="ResultGridViewColumn"/>
+                        <GridViewColumn Header="Kills"
+                                DisplayMemberBinding="{Binding Kills}"
+                                util:GridViewSort.PropertyName="Kills"
+                                x:Name="KillsGridViewColumn"/>
+                        <GridViewColumn Header="Assists"
+                                DisplayMemberBinding="{Binding Assists}"
+                                util:GridViewSort.PropertyName="Assists"
+                                x:Name="AssistsGridViewColumn"/>
+                        <GridViewColumn Header="Deaths"
+                                DisplayMemberBinding="{Binding Deaths}"
+                                util:GridViewSort.PropertyName="Deaths"
+                                x:Name="DeathsGridViewColumn"/>
+                        <GridViewColumn Header="MVPs"
+                                DisplayMemberBinding="{Binding MVPs}"
+                                util:GridViewSort.PropertyName="MVPs"
+                                x:Name="MVPsGridViewColumn"/>
+                        <GridViewColumn Header="Score"
+                                DisplayMemberBinding="{Binding Score}"
+                                util:GridViewSort.PropertyName="Score"
+                                x:Name="ScoreGridViewColumn"/>
+                        <GridViewColumn Header="K/D"
+                                DisplayMemberBinding="{Binding KD}"
+                                util:GridViewSort.PropertyName="KD"
+                                x:Name="KDGridViewColumn"/>
+                        <GridViewColumn Header="Demo, press to Download"
+                                util:GridViewSort.PropertyName="Demo"
+                                x:Name="DemoGridViewColumn">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <Button x:Name="DemoButtonTemp" Content="{Binding Demo}" Click="DemoButton_Click" />
+                                        <ProgressBar x:Name="DemoButtonProgressbar" Width="100" Margin="5,0,0,0" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Demo Comment"
+                                util:GridViewSort.PropertyName="DemoComment"
+                                x:Name="DemoCommentGridViewColumn">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment}"></TextBox>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
