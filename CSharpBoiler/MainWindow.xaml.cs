@@ -51,6 +51,7 @@ namespace CSharpBoiler
         private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
         private AdditionalDemoData additionalDemoData = new AdditionalDemoData();
         private string steamID;
+        private const string DEMOFOLDER = "Demos/";
 
         public MainWindow()
         {
@@ -65,7 +66,7 @@ namespace CSharpBoiler
             //MainListView.ItemsSource = matchDataList;
 
             //DemoCommentsDeserialization
-            if (Directory.Exists("Demos"))
+            if (Directory.Exists(DEMOFOLDER))
             {
                 if (File.Exists("Demos/AdditionalDemoData.xml"))
                 {
@@ -185,7 +186,7 @@ namespace CSharpBoiler
                 //Calculating if we downloaded the Demo
                 string[] tempURLSplit = matchData.Demo.Split('/');
                 string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                matchData.Downloaded = (File.Exists("Demos/" + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
+                matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
 
                 //adding to the MainList of MatchData
                 matchDataList.Add(matchData);
@@ -215,15 +216,15 @@ namespace CSharpBoiler
             string[] tempURLSplit = URL.Split('/');
             string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
 
-            if (!Directory.Exists("Demos"))
-                Directory.CreateDirectory("Demos");
+            if (!Directory.Exists(DEMOFOLDER))
+                Directory.CreateDirectory(DEMOFOLDER);
 
-            if (!File.Exists("Demos/" + tempDemoFileName))
+            if (!File.Exists(DEMOFOLDER + tempDemoFileName))
             {
                 WebClient webClient = new WebClient();
-                webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
+                webClient.DownloadFileCompleted += (senderv, ev) => Completed(senderv, ev, tempDemoFileName);
                 webClient.DownloadProgressChanged += (senderv, ev) => ProgressChanged(senderv, ev, URL); //new DownloadProgressChangedEventHandler(ProgressChanged);
-                webClient.DownloadFileAsync(new Uri(URL), "Demos/" + tempDemoFileName);
+                webClient.DownloadFileAsync(new Uri(URL), DEMOFOLDER + tempDemoFileName);
             }
             else
             {
@@ -243,42 +244,44 @@ namespace CSharpBoiler
             }).ConfigureAwait(continueOnCapturedContext: false);
         }
 
-        private async void Completed(object sender, AsyncCompletedEventArgs e)
+        private async void Completed(object sender, AsyncCompletedEventArgs e, string tempDemoFileName)
         {
             await Task.Run(() =>
             {
-                unzipDemos();
+                UnZipDemo(tempDemoFileName);
 
-                foreach (var matchData in matchDataList)
-                {
-                    if (!matchData.Downloaded)
-                    {
-                        string[] tempURLSplit = matchData.Demo.Split('/');
-                        string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                        matchData.Downloaded = (File.Exists("Demos/" + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
-                    }
-                }
+                UpdateDownloadedList();
 
-                MessageBox.Show("Download completed! Unzipping completed!");
+                MessageBox.Show("Download of: " + tempDemoFileName + " completed! Unzipping completed!");
 
             }).ConfigureAwait(continueOnCapturedContext: false);        
         }
 
-        private void unzipDemos()
+        private void UnZipDemo(string zippedDemoName)
         {
-            if (Directory.Exists("Demos"))
+            if (Directory.Exists(DEMOFOLDER))
             {
-                foreach (string tempFile in Directory.GetFiles("Demos"))
-                {
-                    if (File.Exists(tempFile) && tempFile.Substring(tempFile.Length - 4, 4) == ".bz2" && !File.Exists(tempFile.Substring(0, tempFile.Length - 4)))
+                if (File.Exists(DEMOFOLDER + zippedDemoName) && zippedDemoName.Substring(zippedDemoName.Length - 4, 4) == ".bz2" && !File.Exists(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4)))
                     {
-                        FileStream inputStream = File.Open(tempFile, FileMode.Open, FileAccess.Read);
+                        FileStream inputStream = File.Open(DEMOFOLDER + zippedDemoName, FileMode.Open, FileAccess.Read);
                         //- .bz2
-                        FileStream outputStream = File.Create(tempFile.Substring(0, tempFile.Length - 4));
+                        FileStream outputStream = File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
                         BZip2.Decompress(inputStream, outputStream, true);
                         inputStream.Close();
                         outputStream.Close();
                     }
+            }
+        }
+
+        private void UpdateDownloadedList()
+        {
+            foreach (var matchData in matchDataList)
+            {
+                if (!matchData.Downloaded)
+                {
+                    string[] tempURLSplit = matchData.Demo.Split('/');
+                    string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                    matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
                 }
             }
         }
@@ -327,8 +330,8 @@ namespace CSharpBoiler
             //DemoCommentsSerialization
             ExtractAdditionalDemoData();
 
-            if (!Directory.Exists("Demos"))
-                Directory.CreateDirectory("Demos");
+            if (!Directory.Exists(DEMOFOLDER))
+                Directory.CreateDirectory(DEMOFOLDER);
 
             System.Xml.Serialization.XmlSerializer xmlWriter =
             new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));

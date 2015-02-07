@@ -52,23 +52,23 @@
             CanUserAddRows="False">
 
             <DataGrid.Columns >
-                <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}" MinWidth="50" />
-                <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}" MinWidth="50" />
-                <DataGridTextColumn Header="Kills" IsReadOnly="True" Binding="{Binding Kills}" MinWidth="50" />
-                <DataGridTextColumn Header="Assists" IsReadOnly="True" Binding="{Binding Assists}" MinWidth="50" />
-                <DataGridTextColumn Header="Deaths" IsReadOnly="True" Binding="{Binding Deaths}" MinWidth="50" />
-                <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}" MinWidth="50" />
-                <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}" MinWidth="50" />
-                <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}" MinWidth="50" />
+                <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}"  />
+                <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}"  />
+                <DataGridTextColumn Header="Kills" IsReadOnly="True" Binding="{Binding Kills}"  />
+                <DataGridTextColumn Header="Assists" IsReadOnly="True" Binding="{Binding Assists}"  />
+                <DataGridTextColumn Header="Deaths" IsReadOnly="True" Binding="{Binding Deaths}"  />
+                <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}"  />
+                <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}"  />
+                <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
 
                 <DataGridTemplateColumn Header="Demo, click to Download" CellTemplate="{StaticResource DemoTemplate}" />
                 <DataGridTemplateColumn Header="Analyze, click to Analyze" CellTemplate="{StaticResource AnalyzeTemplate}" />
                 <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
 
-                <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}" MinWidth="50" />
-                <DataGridTextColumn Header="4Ks" IsReadOnly="True" Binding="{Binding K4}" MinWidth="50" />
-                <DataGridTextColumn Header="5Ks" IsReadOnly="True" Binding="{Binding K5}" MinWidth="50" />
-                <DataGridTextColumn Header="HS%" IsReadOnly="True" Binding="{Binding HS}" MinWidth="50" />
+                <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}"  />
+                <DataGridTextColumn Header="4Ks" IsReadOnly="True" Binding="{Binding K4}"  />
+                <DataGridTextColumn Header="5Ks" IsReadOnly="True" Binding="{Binding K5}"  />
+                <DataGridTextColumn Header="HS%" IsReadOnly="True" Binding="{Binding HS}"  />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
