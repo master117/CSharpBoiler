@@ -251,9 +251,6 @@ namespace CSharpBoiler
                 UnZipDemo(tempDemoFileName);
 
                 UpdateDownloadedList();
-
-                MessageBox.Show("Download of: " + tempDemoFileName + " completed! Unzipping completed!");
-
             }).ConfigureAwait(continueOnCapturedContext: false);        
         }
 
@@ -303,11 +300,6 @@ namespace CSharpBoiler
             DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(tempMatchData, steamID);
 
             bool successfulAnalysis = await tempDemoAnalyzer.Analyze();
-
-            if(successfulAnalysis)
-                MessageBox.Show("Analysis completed!");
-            else
-                MessageBox.Show("Error in Analyze, be wary of errors");
         }
 
         public MatchData GetMatchData(string demoURL)
