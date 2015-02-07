@@ -119,10 +119,26 @@ namespace CSharpBoiler
                 matchData.Score = matchlist.GetMatches(i).Roundstats.GetScores(j);
                 matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths)*100))/100);
                 matchData.Demo = matchlist.GetMatches(i).Roundstats.Map; //new DemoButtonUserControl(matchlist.GetMatches(i).Roundstats.Map);
-                //Getting DemoComment
+                //Getting DemoComment, K3, K4, K5, HS
                 if (additionalDemoData.ContainsComment(matchData.Demo))
                 {
                     matchData.DemoComment = additionalDemoData.GetComment(matchData.Demo);
+                }
+                if (additionalDemoData.ContainsK3(matchData.Demo))
+                {
+                    matchData.K3 = additionalDemoData.GetK3(matchData.Demo);
+                }
+                if (additionalDemoData.ContainsK4(matchData.Demo))
+                {
+                    matchData.K4 = additionalDemoData.GetK4(matchData.Demo);
+                }
+                if (additionalDemoData.ContainsK5(matchData.Demo))
+                {
+                    matchData.K5 = additionalDemoData.GetK5(matchData.Demo);
+                }
+                if (additionalDemoData.ContainsHS(matchData.Demo))
+                {
+                    matchData.HS = additionalDemoData.GetHS(matchData.Demo);
                 }
 
 
@@ -289,7 +305,22 @@ namespace CSharpBoiler
 
                 if (tempMatchData.K3 != null)
                 {
-                    additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
+                    additionalDemoData.AddK3(tempMatchData.Demo, tempMatchData.K3);
+                }
+
+                if (tempMatchData.K4 != null)
+                {
+                    additionalDemoData.AddK4(tempMatchData.Demo, tempMatchData.K4);
+                }
+
+                if (tempMatchData.K5 != null)
+                {
+                    additionalDemoData.AddK5(tempMatchData.Demo, tempMatchData.K5);
+                }
+
+                if (tempMatchData.HS != null)
+                {
+                    additionalDemoData.AddHS(tempMatchData.Demo, tempMatchData.HS);
                 }
             }
         }
