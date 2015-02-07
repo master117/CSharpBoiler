@@ -28,6 +28,10 @@
 * [ICSharpCode.SharpZipLib](https://www.nuget.org/packages/ICSharpCode.SharpZipLib.dll/)
 * [protobuf-net](https://code.google.com/p/protobuf-net/)
 
+## TODO ##
+* Many Changes and Improvements to the Analysis, Scoreboard, Accuracy etc
+* Asking Reddit for more Features
+
 ### Thanks ###
 Many Thanks to ACB / Ansas Bogdan for his great work with Boiler
 
