@@ -2,7 +2,7 @@
 
 © [JOHANNES GOCKE](http://steamcommunity.com/id/master117/)
 
-![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/1492217440-Screenshot.png)
+![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/3436326462-Screenshot.png)
 
 # Use at OWN risk #
 
