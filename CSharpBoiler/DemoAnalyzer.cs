@@ -17,6 +17,7 @@ namespace CSharpBoiler
         int mainPlayerID;
         Player mainPlayer;
         DemoParser demoParser;
+        private const long VOLVOMAGICNUMBER = 76561197960265728;
 
         //Parameters for Start->End calculations
         int K3 = 0;
@@ -39,54 +40,55 @@ namespace CSharpBoiler
             long tempSteamIDlong;
             long.TryParse(mainSteamID, out tempSteamIDlong);
             //Volvo Magic Number
-            mainSteamID64Basis = tempSteamIDlong + 76561197960265728;
+            mainSteamID64Basis = tempSteamIDlong + VOLVOMAGICNUMBER;
         }
 
-        public bool Analyze()
+        public async Task<bool> Analyze()
         {
-            
-
-
-            string[] tempURLSplit = mainMatchData.Demo.Split('/');
-            string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-            string demoName = tempDemoFileName.Substring(0, tempDemoFileName.Length - 4);
-
-            //error Checking
-            if (!Directory.Exists("Demos") || !File.Exists("Demos/" + demoName) || demoName.Substring(demoName.Length - 4, 4) != ".dem")
-                return false;
-
-            demoParser = new DemoParser(File.OpenRead("Demos/" + demoName));
-
-            demoParser.MatchStarted += parser_MatchStarted;
-            demoParser.PlayerKilled += HandlePlayerKilled;
-            demoParser.WeaponFired += HandleWeaponFired;
-            demoParser.RoundStart += demoParser_RoundStart;
-
-            demoParser.ParseHeader();
-
-            bool nextTickAvailable = true;
-            try
+            return await Task.Run(() =>
             {
-                while (nextTickAvailable)
+
+                string[] tempURLSplit = mainMatchData.Demo.Split('/');
+                string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                string demoName = tempDemoFileName.Substring(0, tempDemoFileName.Length - 4);
+
+                //error Checking
+                if (!Directory.Exists("Demos") || !File.Exists("Demos/" + demoName) || demoName.Substring(demoName.Length - 4, 4) != ".dem")
+                    return false;
+
+                demoParser = new DemoParser(File.OpenRead("Demos/" + demoName));
+
+                demoParser.MatchStarted += parser_MatchStarted;
+                demoParser.PlayerKilled += HandlePlayerKilled;
+                demoParser.WeaponFired += HandleWeaponFired;
+                demoParser.RoundStart += demoParser_RoundStart;
+
+                demoParser.ParseHeader();
+
+                bool nextTickAvailable = true;
+                try
                 {
-                    nextTickAvailable = demoParser.ParseNextTick();
-                    mainMatchData.AnalysisProgress = (int)(demoParser.ParsingProgess * 100);
+                    while (nextTickAvailable)
+                    {
+                        nextTickAvailable = demoParser.ParseNextTick();
+                        mainMatchData.AnalysisProgress = (int)(demoParser.ParsingProgess * 100);
+                    }
                 }
-            }
-            catch(Exception e)
-            {
-                Debug.WriteLine(e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.StackTrace);
+                }
 
-            mainMatchData.K3 = K3;
-            mainMatchData.K4 = K4;
-            mainMatchData.K5 = K5;
-            if (headShots != 0)
-                mainMatchData.HS = (int)((double)headShots / (double)matchKills * 100.0);
-            else
-                mainMatchData.HS = 0;
+                mainMatchData.K3 = K3;
+                mainMatchData.K4 = K4;
+                mainMatchData.K5 = K5;
+                if (headShots != 0)
+                    mainMatchData.HS = (int)((double)headShots / (double)matchKills * 100.0);
+                else
+                    mainMatchData.HS = 0;
 
-            return true;
+                return true;
+            }).ConfigureAwait(continueOnCapturedContext: false);
         }
 
         //Most Calculation will be done here

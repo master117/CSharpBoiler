@@ -70,7 +70,6 @@
     </ApplicationDefinition>
     <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="AdditionalDemoData.cs" />
-    <Compile Include="GridViewSort.cs" />
     <Compile Include="MatchData.cs" />
     <Compile Include="protoCS\BaseGcmessages.cs" />
     <Compile Include="protoCS\Cstrike15Gcmessages.cs" />

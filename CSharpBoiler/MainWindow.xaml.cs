@@ -30,17 +30,20 @@ namespace CSharpBoiler
     public partial class MainWindow : Window
     {
         private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
-        private AdditionalDemoData demoComments = new AdditionalDemoData();
+        private AdditionalDemoData additionalDemoData = new AdditionalDemoData();
         private string steamID;
 
         public MainWindow()
         {
             InitializeComponent();
+            MainGrid.DataContext = this;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            MainListView.ItemsSource = matchDataList;
+            MainDataGrid.ItemsSource = matchDataList;
+            System.Diagnostics.PresentationTraceSources.SetTraceLevel(MainDataGrid.ItemContainerGenerator, System.Diagnostics.PresentationTraceLevel.High);
+            //MainListView.ItemsSource = matchDataList;
 
             //DemoCommentsDeserialization
             if (Directory.Exists("Demos"))
@@ -51,7 +54,7 @@ namespace CSharpBoiler
                     new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
                     System.IO.StreamReader streamReader = new System.IO.StreamReader(
                         "Demos/AdditionalDemoData.xml");
-                    demoComments = (AdditionalDemoData)xmlReader.Deserialize(streamReader);
+                    additionalDemoData = (AdditionalDemoData)xmlReader.Deserialize(streamReader);
 
                     streamReader.Close();
                 }
@@ -117,9 +120,9 @@ namespace CSharpBoiler
                 matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths)*100))/100);
                 matchData.Demo = matchlist.GetMatches(i).Roundstats.Map; //new DemoButtonUserControl(matchlist.GetMatches(i).Roundstats.Map);
                 //Getting DemoComment
-                if (demoComments.Contains(matchData.Demo))
+                if (additionalDemoData.ContainsComment(matchData.Demo))
                 {
-                    matchData.DemoComment = demoComments.Get(matchData.Demo);
+                    matchData.DemoComment = additionalDemoData.GetComment(matchData.Demo);
                 }
 
 
@@ -167,9 +170,8 @@ namespace CSharpBoiler
             {
                 WebClient webClient = new WebClient();
                 webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                webClient.DownloadProgressChanged += (senderv, ev) => ProgressChanged(senderv, ev, URL); //new DownloadProgressChangedEventHandler(ProgressChanged);
                 webClient.DownloadFileAsync(new Uri(URL), "Demos/" + tempDemoFileName);
-                tempButton.Background = Brushes.LightGreen;
             }
             else
             {
@@ -177,15 +179,37 @@ namespace CSharpBoiler
             }
         }
 
-        private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private async void ProgressChanged(object sender, DownloadProgressChangedEventArgs e, string URL)
         {
-            //DemoButtonProgressbar.Value = e.ProgressPercentage;
+            await Task.Run(() =>
+            {
+                foreach(var matchData in matchDataList)
+                {
+                    if (matchData.Demo == URL)
+                        matchData.DownloadProgress = e.ProgressPercentage;
+                }
+            }).ConfigureAwait(continueOnCapturedContext: false);
         }
 
-        private void Completed(object sender, AsyncCompletedEventArgs e)
+        private async void Completed(object sender, AsyncCompletedEventArgs e)
         {
-            unzipDemos();
-            MessageBox.Show("Download completed! Unzipping completed!");
+            await Task.Run(() =>
+            {
+                unzipDemos();
+
+                foreach (var matchData in matchDataList)
+                {
+                    if (!matchData.Downloaded)
+                    {
+                        string[] tempURLSplit = matchData.Demo.Split('/');
+                        string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                        matchData.Downloaded = (File.Exists("Demos/" + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
+                    }
+                }
+
+                MessageBox.Show("Download completed! Unzipping completed!");
+
+            }).ConfigureAwait(continueOnCapturedContext: false);        
         }
 
         private void unzipDemos()
@@ -207,13 +231,18 @@ namespace CSharpBoiler
 
         #endregion
 
-        private void DemoAnalyzeButton_Click(object sender, RoutedEventArgs e)
+        private async void DemoAnalyzeButton_Click(object sender, RoutedEventArgs e)
         {
             string url = ((Button)sender).Tag.ToString();
-            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(GetMatchData(url), steamID);
-            tempDemoAnalyzer.Analyze();
 
-            MessageBox.Show("Analysis completed!");
+            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(GetMatchData(url), steamID);
+
+            bool successfulAnalysis = await tempDemoAnalyzer.Analyze();
+
+            if(successfulAnalysis)
+                MessageBox.Show("Analysis completed!");
+            else
+                MessageBox.Show("Error in Analyze, be wary of errors");
         }
 
         public MatchData GetMatchData(string demoURL)
@@ -244,7 +273,7 @@ namespace CSharpBoiler
 
             System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(
             "Demos/AdditionalDemoData.xml");
-            xmlWriter.Serialize(streamWriter, demoComments);
+            xmlWriter.Serialize(streamWriter, additionalDemoData);
 
             streamWriter.Close();
         }
@@ -255,7 +284,12 @@ namespace CSharpBoiler
             {
                 if(tempMatchData.DemoComment != null)
                 {
-                    demoComments.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
+                    additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
+                }
+
+                if (tempMatchData.K3 != null)
+                {
+                    additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
                 }
             }
         }

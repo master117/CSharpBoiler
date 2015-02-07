@@ -13,6 +13,7 @@ namespace CSharpBoiler
     {
         //Key = DemoName, Value = DemoComment
         public SerializableDictionary<string, string> DemoCommentDictionary = new SerializableDictionary<string, string>();
+        public SerializableDictionary<string, string> DemoCommentDictionary = new SerializableDictionary<string, string>();
 
         public void AddComment(string key, string value)
         {
@@ -22,12 +23,12 @@ namespace CSharpBoiler
             DemoCommentDictionary.Add(key, value);
         }
 
-        public bool Contains(string key)
+        public bool ContainsComment(string key)
         {
             return DemoCommentDictionary.ContainsKey(key);
         }
 
-        public string Get(string key)
+        public string GetComment(string key)
         {
             return DemoCommentDictionary[key];
         }
