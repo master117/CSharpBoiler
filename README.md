@@ -6,7 +6,7 @@
 
 # Use at OWN risk #
 
-## Running Instruction ##
+## Running  ##
 
 To Run this Application, 
 1. Download it (bundled with the Dependencies) and just Run CSharpBoiler.exe.
@@ -19,3 +19,7 @@ To Run this Application,
 
 ### Dependencies ###
 * [DemoInfo-Public](https://github.com/moritzuehling/demoinfo-public) by moritzuehling / flai / [Fs0i](http://www.reddit.com/user/Fs0i)
+* [Google.Protocol.Buffers](https://www.nuget.org/packages/Google.ProtocolBuffers/)
+* [ICSharpCode.SharpZipLib](https://www.nuget.org/packages/ICSharpCode.SharpZipLib.dll/)
+* [protobuf-net](https://code.google.com/p/protobuf-net/)
+
