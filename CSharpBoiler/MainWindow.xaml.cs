@@ -40,6 +40,7 @@ using System.Net;
 using System.ComponentModel;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace CSharpBoiler
 {
@@ -62,8 +63,9 @@ namespace CSharpBoiler
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             MainDataGrid.ItemsSource = matchDataList;
-            System.Diagnostics.PresentationTraceSources.SetTraceLevel(MainDataGrid.ItemContainerGenerator, System.Diagnostics.PresentationTraceLevel.High);
-            //MainListView.ItemsSource = matchDataList;
+            MainDataGrid.SelectionChanged += (obj, ev) =>
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            MainDataGrid.UnselectAll()));
 
             //DemoCommentsDeserialization
             if (Directory.Exists(DEMOFOLDER))
@@ -211,7 +213,7 @@ namespace CSharpBoiler
         private void DemoDownloadButton_Click(object sender, RoutedEventArgs e)
         {
             Button tempButton = (Button)sender;
-            string URL = (string)tempButton.Content;
+            string URL = (string)tempButton.Tag.ToString();
 
             string[] tempURLSplit = URL.Split('/');
             string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];

@@ -1,9 +1,11 @@
 ﻿<Window x:Class="CSharpBoiler.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="1560"
+        xmlns:m="clr-namespace:CSharpBoiler"
+        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="950"
         DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Boiler.ico">
     <Window.Resources>
+        <m:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Won}" Value="False">
@@ -14,9 +16,27 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style TargetType="{x:Type Button}">
+        
+        <Style x:Key="DownloadButtonStyle" TargetType="Button">
             <Style.Triggers>
+                <DataTrigger Binding="{Binding Downloaded}" Value="False">
+                    <Setter Property="Background" Value="Transparent" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Downloaded}" Value="True">
+                    <Setter Property="Background" Value="LightGreen" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="AnalyzeButtonStyle" TargetType="Button">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding AnalysisProgress,
+                    Converter={StaticResource IsLessThanConverter},
+                    ConverterParameter=100}" Value="True">
+                    <Setter Property="Background" Value="Transparent" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AnalysisProgress}" Value="100">
                     <Setter Property="Background" Value="LightGreen" />
                 </DataTrigger>
             </Style.Triggers>
@@ -27,16 +47,16 @@
         <Grid.Resources>
             <!--DataTemplates for DemoSection -->
             <DataTemplate x:Key="DemoTemplate" >
-                <DockPanel>
-                    <Button x:Name="DemoDownloadButton" Content="{Binding Demo}" Click="DemoDownloadButton_Click" />
-                    <ProgressBar x:Name="DemoDownloadButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5,0,0,0" />
-                </DockPanel>
+                <Grid>
+                    <ProgressBar x:Name="DemoDownloadButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" />
+                    <Button x:Name="DemoDownloadButton" Content="Download Demo" Tag="{Binding Demo}" Style="{StaticResource DownloadButtonStyle}" Width="100" Click="DemoDownloadButton_Click" />                   
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="AnalyzeTemplate" >
-                <DockPanel>
-                    <Button x:Name="DemoAnalyzeButton" Content="Analyze" Tag="{Binding Demo}" Background="LightGray" Click="DemoAnalyzeButton_Click" />
-                    <ProgressBar x:Name="DemoAnalyzeButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="5,0,0,0" />
-                </DockPanel>
+                <Grid>
+                    <ProgressBar x:Name="DemoAnalyzeButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" />
+                    <Button x:Name="DemoAnalyzeButton" Content="Analyze" Tag="{Binding Demo}" Style="{StaticResource AnalyzeButtonStyle}" Width="100" Click="DemoAnalyzeButton_Click" />
+                </Grid>
             </DataTemplate>
             <DataTemplate x:Key="DemoCommentTemplate" >
                 <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
@@ -46,10 +66,11 @@
         <DataGrid
             PresentationTraceSources.TraceLevel="High"
             AutoGenerateColumns="False"
-            HorizontalAlignment="Left" 
+            HorizontalAlignment="Stretch" 
             Name="MainDataGrid" 
             VerticalAlignment="Top"
-            CanUserAddRows="False">
+            CanUserAddRows="False"
+            RowHeaderWidth="0">
 
             <DataGrid.Columns >
                 <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}"  />
@@ -61,8 +82,8 @@
                 <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}"  />
                 <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
 
-                <DataGridTemplateColumn Header="Demo, click to Download" CellTemplate="{StaticResource DemoTemplate}" />
-                <DataGridTemplateColumn Header="Analyze, click to Analyze" CellTemplate="{StaticResource AnalyzeTemplate}" />
+                <DataGridTemplateColumn Header="Demo" CellTemplate="{StaticResource DemoTemplate}" />
+                <DataGridTemplateColumn Header="Analyze" CellTemplate="{StaticResource AnalyzeTemplate}" />
                 <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
 
                 <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}"  />
