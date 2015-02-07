@@ -77,7 +77,14 @@ namespace CSharpBoiler
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "dat files (*.dat)|*.dat";
             openFileDialog.ShowDialog();
-            FileStream dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
+            try
+            {
+                FileStream dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
+            }
+            catch(Exception e)
+            {
+                this.Close();
+            }
             steamID = openFileDialog.SafeFileName.Split('_')[0];
 
             CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
