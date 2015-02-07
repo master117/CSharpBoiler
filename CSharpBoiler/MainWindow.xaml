@@ -7,10 +7,10 @@
         <Style TargetType="{x:Type DataGridCell}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Won}" Value="False">
-                    <Setter Property="Background" Value="Red" />
+                    <Setter Property="Background" Value="#FFFFB3B3" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Won}" Value="True">
-                    <Setter Property="Background" Value="LightGreen" />
+                    <Setter Property="Background" Value="#FFAFFFAF" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -42,7 +42,7 @@
                 <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
             </DataTemplate>
         </Grid.Resources>
-        
+
         <DataGrid
             PresentationTraceSources.TraceLevel="High"
             AutoGenerateColumns="False"
@@ -50,25 +50,25 @@
             Name="MainDataGrid" 
             VerticalAlignment="Top"
             CanUserAddRows="False">
-            
+
             <DataGrid.Columns >
-                <DataGridTextColumn Header="Date" Binding="{Binding Date}" MinWidth="50" />
-                <DataGridTextColumn Header="Result" Binding="{Binding Result}" MinWidth="50" />
-                <DataGridTextColumn Header="Kills" Binding="{Binding Kills}" MinWidth="50" />
-                <DataGridTextColumn Header="Assists" Binding="{Binding Assists}" MinWidth="50" />
-                <DataGridTextColumn Header="Deaths" Binding="{Binding Deaths}" MinWidth="50" />
-                <DataGridTextColumn Header="MVPs" Binding="{Binding MVPs}" MinWidth="50" />
-                <DataGridTextColumn Header="Score" Binding="{Binding Score}" MinWidth="50" />
-                <DataGridTextColumn Header="K/D" Binding="{Binding KD}" MinWidth="50" />
-                
+                <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}" MinWidth="50" />
+                <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}" MinWidth="50" />
+                <DataGridTextColumn Header="Kills" IsReadOnly="True" Binding="{Binding Kills}" MinWidth="50" />
+                <DataGridTextColumn Header="Assists" IsReadOnly="True" Binding="{Binding Assists}" MinWidth="50" />
+                <DataGridTextColumn Header="Deaths" IsReadOnly="True" Binding="{Binding Deaths}" MinWidth="50" />
+                <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}" MinWidth="50" />
+                <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}" MinWidth="50" />
+                <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}" MinWidth="50" />
+
                 <DataGridTemplateColumn Header="Demo, click to Download" CellTemplate="{StaticResource DemoTemplate}" />
                 <DataGridTemplateColumn Header="Analyze, click to Analyze" CellTemplate="{StaticResource AnalyzeTemplate}" />
                 <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
 
-                <DataGridTextColumn Header="3Ks" Binding="{Binding K3}" MinWidth="50" />
-                <DataGridTextColumn Header="4Ks" Binding="{Binding K4}" MinWidth="50" />
-                <DataGridTextColumn Header="5Ks" Binding="{Binding K5}" MinWidth="50" />
-                <DataGridTextColumn Header="HS%" Binding="{Binding HS}" MinWidth="50" />
+                <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}" MinWidth="50" />
+                <DataGridTextColumn Header="4Ks" IsReadOnly="True" Binding="{Binding K4}" MinWidth="50" />
+                <DataGridTextColumn Header="5Ks" IsReadOnly="True" Binding="{Binding K5}" MinWidth="50" />
+                <DataGridTextColumn Header="HS%" IsReadOnly="True" Binding="{Binding HS}" MinWidth="50" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

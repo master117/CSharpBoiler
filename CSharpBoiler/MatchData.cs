@@ -38,7 +38,16 @@ namespace CSharpBoiler
         public int Score { get; set; }
         public double KD { get; set; }
         public string Demo { get; set; }      
-        public bool Downloaded { get; set; }
+        public bool _Downloaded { get; set; }
+        public bool Downloaded
+        {
+            get { return _Downloaded; }
+            set
+            {
+                _Downloaded = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("Downloaded"));
+            }
+        }
         public int _DownloadProgress { get; set; }
         public int DownloadProgress
         {

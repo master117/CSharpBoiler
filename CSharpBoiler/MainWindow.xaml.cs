@@ -106,9 +106,9 @@ namespace CSharpBoiler
                 CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
                 CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
 
-                ParseMatchData(matchlist, steamID);
+                dataFileStream.Close();
 
-                matchDataList.Reverse();
+                ParseMatchData(matchlist, steamID);
             }
             catch (Exception e)
             {
@@ -124,14 +124,12 @@ namespace CSharpBoiler
         //Parses The Data from MatchList to the UI Model
         public void ParseMatchData(CMsgGCCStrike15_v2_MatchList matchlist, string steamID)
         {
-            for(int i = 0; i < matchlist.MatchesCount; i++)
+            for (int i = matchlist.MatchesCount - 1; i >= 0; i--)
             {
                 //Creating new MatchData
                 MatchData matchData = new MatchData();
                 //Date
                 matchData.Date = UnixTimeStampToDateTime(matchlist.GetMatches(i).Matchtime).ToString("yyyy-MM-dd hh:mm");
-                //Overall Score, ex. 16:13
-                matchData.Result = matchlist.GetMatches(i).Roundstats.GetTeamScores(0).ToString() + ":" + matchlist.GetMatches(i).Roundstats.GetTeamScores(1).ToString();
                 //Finding the Position of our own entries
                 int j = 0;
                 for (; j < matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount; j++)
@@ -171,9 +169,19 @@ namespace CSharpBoiler
 
 
                 //Calculating if we won the match
-                matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(0) > matchlist.GetMatches(i).Roundstats.GetTeamScores(1) && j < (double)matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2
-                                || matchlist.GetMatches(i).Roundstats.GetTeamScores(0) < matchlist.GetMatches(i).Roundstats.GetTeamScores(1) && j > (double)matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2);
-                 
+                if (j < matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2)
+                {
+                    //Overall Score, ex. 16:13
+                    matchData.Result = matchlist.GetMatches(i).Roundstats.GetTeamScores(0).ToString() + ":" + matchlist.GetMatches(i).Roundstats.GetTeamScores(1).ToString();
+                    matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(0) > matchlist.GetMatches(i).Roundstats.GetTeamScores(1));
+                }
+                else
+                {
+                    //Overall Score, ex. 16:13
+                    matchData.Result = matchlist.GetMatches(i).Roundstats.GetTeamScores(1).ToString() + ":" + matchlist.GetMatches(i).Roundstats.GetTeamScores(0).ToString();
+                    matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(1) > matchlist.GetMatches(i).Roundstats.GetTeamScores(0));
+                }
+
                 //Calculating if we downloaded the Demo
                 string[] tempURLSplit = matchData.Demo.Split('/');
                 string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
@@ -264,10 +272,12 @@ namespace CSharpBoiler
                 {
                     if (File.Exists(tempFile) && tempFile.Substring(tempFile.Length - 4, 4) == ".bz2" && !File.Exists(tempFile.Substring(0, tempFile.Length - 4)))
                     {
-                        FileStream inputStream = File.Open(tempFile, FileMode.Open);
+                        FileStream inputStream = File.Open(tempFile, FileMode.Open, FileAccess.Read);
                         //- .bz2
                         FileStream outputStream = File.Create(tempFile.Substring(0, tempFile.Length - 4));
                         BZip2.Decompress(inputStream, outputStream, true);
+                        inputStream.Close();
+                        outputStream.Close();
                     }
                 }
             }
@@ -279,7 +289,15 @@ namespace CSharpBoiler
         {
             string url = ((Button)sender).Tag.ToString();
 
-            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(GetMatchData(url), steamID);
+            MatchData tempMatchData = GetMatchData(url);
+
+            if(!tempMatchData.Downloaded)
+            {
+                MessageBox.Show("Demo is not (fully) Downloaded or Unzipped, please wait a second or Start the Download if you didn't already do so.");
+                return;
+            }
+
+            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(tempMatchData, steamID);
 
             bool successfulAnalysis = await tempDemoAnalyzer.Analyze();
 
