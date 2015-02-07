@@ -12,3 +12,5 @@ To Run this Application,
 4. After Downloading and Unzippig click on Analyze to get more Data.
 
 ![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/1492217440-Screenshot.png)
+
+#Use at OWN risk # 
