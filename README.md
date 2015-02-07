@@ -7,5 +7,4 @@ Then chose a .dat file created with Boiler/BoilerDaemon.
 To Download a Demo just click on the Link. 
 After Downloading and Unzippig click on Analyze to get more Data.
 
-![ss+(2015-02-07+at+11.21.30).png](https://bitbucket.org/repo/Az8xKM/images/316173477-ss+(2015-02-07+at+11.21.30).png)
-
+![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/1492217440-Screenshot.png)
