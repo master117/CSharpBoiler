@@ -74,25 +74,27 @@ namespace CSharpBoiler
 
         public void FillInData()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "dat files (*.dat)|*.dat";
-            openFileDialog.ShowDialog();
             try
             {
-                FileStream dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "dat files (*.dat)|*.dat";
+                openFileDialog.ShowDialog();
+                FileStream dataFileStream;
+
+                dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
+                steamID = openFileDialog.SafeFileName.Split('_')[0];
+
+                CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
+                CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
+
+                ParseMatchData(matchlist, steamID);
+
+                matchDataList.Reverse();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.Close();
             }
-            steamID = openFileDialog.SafeFileName.Split('_')[0];
-
-            CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
-            CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
-
-            ParseMatchData(matchlist, steamID);
-
-            matchDataList.Reverse();
         }
 
         #region MatchData Parrsing
