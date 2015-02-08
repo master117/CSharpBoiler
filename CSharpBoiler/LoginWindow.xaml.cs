@@ -45,7 +45,7 @@ namespace CSharpBoiler
             //SteamApp.Login(UserNameTextBox.Text, PasswordTextBox.Text);
 
             string username = UserNameTextBox.Text;
-            string password = PasswordTextBox.Text;
+            string password = PasswordTextBox.Password;
 
             loginThread = new Thread(() => SteamApp.Login(username, password));
             loginThread.SetApartmentState(ApartmentState.STA);

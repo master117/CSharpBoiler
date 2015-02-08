@@ -8,7 +8,7 @@
             <TextBox Name="UserNameTextBox" Margin="5" />
 
             <Label Content="Password:" Margin="5" />
-            <TextBox Name="PasswordTextBox" Margin="5" />
+            <PasswordBox Name="PasswordTextBox" Margin="5" />
 
             <Button Name="LoginButton" Content="Login" Click="LoginButton_Click" Margin="5" />
         </StackPanel>

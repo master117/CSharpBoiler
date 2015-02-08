@@ -110,6 +110,7 @@ namespace CSharpBoiler
         }
 
         //TODO Mix Downloaded with already have
+        /*
         public void FillInData()
         {
             try
@@ -134,6 +135,7 @@ namespace CSharpBoiler
                 this.Close();
             }
         }
+         */ 
 
         #region MatchData Parrsing
         //
@@ -351,6 +353,8 @@ namespace CSharpBoiler
             xmlWriter.Serialize(streamWriter, additionalDemoData);
 
             streamWriter.Close();
+
+            Application.Current.Shutdown(1);
         }
 
         private void ExtractAdditionalDemoData()
