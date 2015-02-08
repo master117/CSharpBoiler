@@ -38,12 +38,12 @@ using System.IO;
 using Microsoft.Win32;
 using System.Net;
 using System.ComponentModel;
-using ICSharpCode.SharpZipLib.BZip2;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using SteamKit2.GC;
 using SteamKit2.GC.CSGO.Internal;
 using System.Threading;
+using ICSharpCode.SharpZipLib.BZip2;
 
 namespace CSharpBoiler
 {
