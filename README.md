@@ -8,19 +8,15 @@
 
 ## Installation ##
 
-1. Download it (bundled with the Dependencies) and place it anywhere you please, if possible, close to boiler. 
+1. Download it (bundled with the Dependencies) and place it anywhere you please.
 
 ## Usage  ##
 
 1. Run CSharpBoiler.exe.
 
-2. Chose a .dat file created with Boiler/BoilerDaemon. https://bitbucket.org/ACB/boiler/overview
+2. Download a Demo by clicking on the Button
 
-3. Download a Demo by clicking on the Link
-
-4. After Downloading and Unzippig click on Analyze to get more Data.
-
-**Note: CSharpBoiler does in no way interact neither with the Steam Client nor the CSGO Client**
+3. After Downloading and Unzippig click on Analyze to get more Data.
 
 ### Dependencies ###
 * [DemoInfo-Public](https://github.com/moritzuehling/demoinfo-public) by moritzuehling / flai / [Fs0i](http://www.reddit.com/user/Fs0i)
@@ -33,6 +29,8 @@
 * Asking Reddit for more Features
 
 ### Thanks ###
+Many Thanks to [MoBaTeY](http://www.reddit.com/user/MoBaTeY) for his insight in how to use SteamKit
+
 Many Thanks to ACB / Ansas Bogdan for his great work with Boiler
 
 Many Thanks to moritzuehling / flai / [Fs0i](http://www.reddit.com/user/Fs0i) for his prompt help with demoinfogo
