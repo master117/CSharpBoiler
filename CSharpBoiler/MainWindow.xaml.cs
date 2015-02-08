@@ -41,6 +41,9 @@ using System.ComponentModel;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using SteamKit2.GC;
+using SteamKit2.GC.CSGO.Internal;
+using System.Threading;
 
 namespace CSharpBoiler
 {
@@ -51,12 +54,14 @@ namespace CSharpBoiler
     {
         private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
         private AdditionalDemoData additionalDemoData = new AdditionalDemoData();
-        private string steamID;
+        Thread mainCSGOThread;
+        private long steamID;
         private const string DEMOFOLDER = "Demos/";
 
-        public MainWindow()
+        public MainWindow(long tempSteamID)
         {
             InitializeComponent();
+            steamID = tempSteamID;
             MainGrid.DataContext = this;
         }
 
@@ -81,19 +86,30 @@ namespace CSharpBoiler
                     streamReader.Close();
                 }
             }
-
-            //UpdateMatchList
-            FillInData();
+           
+            CSGOApp.CSGOClientWelcomeCallback = CSGOWelcomeEvent;
+            CSGOApp.CSGOMatchHistoryCallback = OnCSGOMatchDetails;
+            Thread csGOThread = new Thread(() => CSGOApp.LaunchClient());
+            csGOThread.Start();
         }
 
-        public void UpdateMatchList()
+        void CSGOWelcomeEvent()
         {
-            ProcessStartInfo boilerProcessStartInfo = new ProcessStartInfo("Boiler\\Boiler.exe");
-
-            Process boilerProcess = Process.Start(boilerProcessStartInfo);
-            boilerProcess.Close();
+            //CSGOApp.RequestMatchHistory(steamID);
+            Thread myNewThread2 = new Thread(() => CSGOApp.RequestMatchHistory(steamID));
+            myNewThread2.Start();
         }
 
+        void OnCSGOMatchDetails(IPacketGCMsg packetMsg)
+        {
+            ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList> matchListConstruct = new ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList>(packetMsg);
+
+            CMsgGCCStrike15_v2_MatchList matchList = matchListConstruct.Body;
+
+            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(matchList, steamID); }));
+        }
+
+        //TODO Mix Downloaded with already have
         public void FillInData()
         {
             try
@@ -125,29 +141,29 @@ namespace CSharpBoiler
         //
 
         //Parses The Data from MatchList to the UI Model
-        public void ParseMatchData(CMsgGCCStrike15_v2_MatchList matchlist, string steamID)
+        public void ParseMatchData(CMsgGCCStrike15_v2_MatchList matchlist, long steamID)
         {
-            for (int i = matchlist.MatchesCount - 1; i >= 0; i--)
+            for (int i = matchlist.matches.Count - 1; i >= 0; i--)
             {
                 //Creating new MatchData
                 MatchData matchData = new MatchData();
                 //Date
-                matchData.Date = UnixTimeStampToDateTime(matchlist.GetMatches(i).Matchtime).ToString("yyyy-MM-dd hh:mm");
+                matchData.Date = UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToString("yyyy-MM-dd hh:mm");
                 //Finding the Position of our own entries
                 int j = 0;
-                for (; j < matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount; j++)
+                for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
                 {
-                    if (matchlist.GetMatches(i).Roundstats.Reservation.GetAccountIds(j).ToString() == steamID)
+                    if (matchlist.matches[i].roundstats.reservation.account_ids[j] == (uint)steamID)
                         break;
                 }
                 //Kills, Assists, Deaths, MVP, Score, KD, Demo
-                matchData.Kills = matchlist.GetMatches(i).Roundstats.GetKills(j);
-                matchData.Assists = matchlist.GetMatches(i).Roundstats.GetAssists(j);
-                matchData.Deaths = matchlist.GetMatches(i).Roundstats.GetDeaths(j);
-                matchData.MVPs = matchlist.GetMatches(i).Roundstats.GetMvps(j);
-                matchData.Score = matchlist.GetMatches(i).Roundstats.GetScores(j);
+                matchData.Kills = matchlist.matches[i].roundstats.kills[i];
+                matchData.Assists = matchlist.matches[i].roundstats.assists[i];
+                matchData.Deaths = matchlist.matches[i].roundstats.deaths[i];
+                matchData.MVPs = matchlist.matches[i].roundstats.mvps[i];
+                matchData.Score = matchlist.matches[i].roundstats.scores[i];
                 matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths)*100))/100);
-                matchData.Demo = matchlist.GetMatches(i).Roundstats.Map; //new DemoButtonUserControl(matchlist.GetMatches(i).Roundstats.Map);
+                matchData.Demo = matchlist.matches[i].roundstats.map; //new DemoButtonUserControl(matchlist.matches[i].roundstats.Map);
                 //Getting DemoComment, K3, K4, K5, HS
                 if (additionalDemoData.ContainsComment(matchData.Demo))
                 {
@@ -172,17 +188,17 @@ namespace CSharpBoiler
 
 
                 //Calculating if we won the match
-                if (j < matchlist.GetMatches(i).Roundstats.Reservation.AccountIdsCount / 2)
+                if (j < matchlist.matches[i].roundstats.reservation.account_ids.Count / 2)
                 {
                     //Overall Score, ex. 16:13
-                    matchData.Result = matchlist.GetMatches(i).Roundstats.GetTeamScores(0).ToString() + ":" + matchlist.GetMatches(i).Roundstats.GetTeamScores(1).ToString();
-                    matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(0) > matchlist.GetMatches(i).Roundstats.GetTeamScores(1));
+                    matchData.Result = matchlist.matches[i].roundstats.team_scores[0].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[1].ToString();
+                    matchData.Won = (matchlist.matches[i].roundstats.team_scores[0] > matchlist.matches[i].roundstats.team_scores[1]);
                 }
                 else
                 {
                     //Overall Score, ex. 16:13
-                    matchData.Result = matchlist.GetMatches(i).Roundstats.GetTeamScores(1).ToString() + ":" + matchlist.GetMatches(i).Roundstats.GetTeamScores(0).ToString();
-                    matchData.Won = (matchlist.GetMatches(i).Roundstats.GetTeamScores(1) > matchlist.GetMatches(i).Roundstats.GetTeamScores(0));
+                    matchData.Result = matchlist.matches[i].roundstats.team_scores[1].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[0].ToString();
+                    matchData.Won = (matchlist.matches[i].roundstats.team_scores[1] > matchlist.matches[i].roundstats.team_scores[0]);
                 }
 
                 //Calculating if we downloaded the Demo

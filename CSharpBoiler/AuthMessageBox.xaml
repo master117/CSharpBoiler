@@ -1,0 +1,12 @@
+﻿<Window x:Class="CSharpBoiler.AuthMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AuthMessageBox" Height="150" Width="350">
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="Please enter the authentication code sent to your email:" Margin="5"/>
+            <TextBox x:Name="ResponseTextBox" Margin="5" />
+            <Button Content="OK" Click="OKButton_Click" Margin="5" />
+        </StackPanel>
+    </Grid>
+</Window>

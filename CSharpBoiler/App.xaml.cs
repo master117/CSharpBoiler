@@ -31,5 +31,16 @@ namespace CSharpBoiler
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            LoginWindow.LoggedInEvent += LoginWindow_LoggedInEvent;
+        }
+
+        void LoginWindow_LoggedInEvent(long steamID)
+        {
+            MainWindow mainWindow = new MainWindow(steamID);
+            mainWindow.Show();
+        }
+        
     }
 }

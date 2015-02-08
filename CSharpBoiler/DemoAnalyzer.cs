@@ -30,7 +30,7 @@ namespace CSharpBoiler
     class DemoAnalyzer
     {
         MatchData mainMatchData;
-        string mainSteamID;
+        long mainSteamID;
         long mainSteamID64Basis;
         int mainPlayerID;
         Player mainPlayer;
@@ -50,15 +50,13 @@ namespace CSharpBoiler
 
 
 
-        public DemoAnalyzer(MatchData tempMatchData, string tempSteamID)
+        public DemoAnalyzer(MatchData tempMatchData, long tempSteamID)
         {
             mainMatchData = tempMatchData;
             mainSteamID = tempSteamID;
 
-            long tempSteamIDlong;
-            long.TryParse(mainSteamID, out tempSteamIDlong);
             //Volvo Magic Number
-            mainSteamID64Basis = tempSteamIDlong + VOLVOMAGICNUMBER;
+            mainSteamID64Basis = mainSteamID + VOLVOMAGICNUMBER;
         }
 
         public async Task<bool> Analyze()

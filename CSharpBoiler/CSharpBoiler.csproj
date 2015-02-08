@@ -77,8 +77,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DemoInfo">
-      <HintPath>DemoInfoGo\DemoInfo.dll</HintPath>
+    <Reference Include="DemoInfo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dc7de83c756ec63d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DemoInfo.1.0.1\lib\net45\DemoInfo.dll</HintPath>
     </Reference>
     <Reference Include="Google.ProtocolBuffers, Version=2.4.1.521, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.ProtocolBuffers.2.4.1.521\lib\net40\Google.ProtocolBuffers.dll</HintPath>
@@ -91,6 +92,9 @@
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SteamKit2">
+      <HintPath>..\packages\SteamKit2.1.6.2\lib\net40\SteamKit2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -111,21 +115,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AuthMessageBox.xaml.cs">
+      <DependentUpon>AuthMessageBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="AdditionalDemoData.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="IsLessThanConverter.cs" />
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MatchData.cs" />
-    <Compile Include="protoCS\BaseGcmessages.cs" />
-    <Compile Include="protoCS\Cstrike15Gcmessages.cs" />
-    <Compile Include="protoCS\Cstrike15Usermessages.cs" />
-    <Compile Include="protoCS\DescriptorProtoFile.cs" />
-    <Compile Include="protoCS\EconGcmessages.cs" />
-    <Compile Include="protoCS\GcsdkGcmessages.cs" />
-    <Compile Include="protoCS\Gcsystemmsgs.cs" />
-    <Compile Include="protoCS\Htmlmessages.cs" />
-    <Compile Include="protoCS\Netmessages.cs" />
-    <Compile Include="protoCS\Steammessages.cs" />
     <Compile Include="SerializableDictionary.cs" />
+    <Compile Include="SteamConnection\CSGOApp.cs" />
+    <Compile Include="SteamConnection\SteamApp.cs" />
+    <Page Include="AuthMessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
