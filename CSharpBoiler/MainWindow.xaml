@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:CSharpBoiler"
         Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="950"
-        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Boiler.ico">
+        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Ico/Boiler.ico">
     <Window.Resources>
         <m:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
