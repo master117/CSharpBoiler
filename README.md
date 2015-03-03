@@ -3,9 +3,9 @@
 © [JOHANNES GOCKE](http://steamcommunity.com/id/master117/)
 
 ### StandAlone ###
-![ss+(2015-03-03+at+10.50.34).png](https://bitbucket.org/repo/Az8xKM/images/1255048930-ss+(2015-03-03+at+10.50.34).png)
+![Screenshot_StandAlone1.png](https://bitbucket.org/repo/Az8xKM/images/3993023194-Screenshot_StandAlone1.png)
 
-![ss+(2015-03-03+at+11.00.20).png](https://bitbucket.org/repo/Az8xKM/images/2528237567-ss+(2015-03-03+at+11.00.20).png)
+![Screenshot_StandAlone2.png](https://bitbucket.org/repo/Az8xKM/images/3120571173-Screenshot_StandAlone2.png)
 
 ### BoilerVersion ###
 ![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/2848763591-Screenshot.png)
