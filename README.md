@@ -2,7 +2,13 @@
 
 © [JOHANNES GOCKE](http://steamcommunity.com/id/master117/)
 
-![![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/3436326462-Screenshot.png)](https://bitbucket.org/repo/Az8xKM/images/3263830648-Screenshot.png)
+### StandAlone ###
+![ss+(2015-03-03+at+10.50.34).png](https://bitbucket.org/repo/Az8xKM/images/1255048930-ss+(2015-03-03+at+10.50.34).png)
+
+![ss+(2015-03-03+at+11.00.20).png](https://bitbucket.org/repo/Az8xKM/images/2528237567-ss+(2015-03-03+at+11.00.20).png)
+
+### BoilerVersion ###
+![Screenshot.png](https://bitbucket.org/repo/Az8xKM/images/2848763591-Screenshot.png)
 
 # Use at OWN risk #
 
