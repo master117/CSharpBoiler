@@ -37,6 +37,8 @@
 ### Thanks ###
 Many Thanks to [MoBaTeY](http://www.reddit.com/user/MoBaTeY) for his insight in how to use SteamKit
 
-Many Thanks to ACB / Ansas Bogdan for his great work with Boiler
+Many Thanks to ACB for his great work with Boiler
+
+Many Thanks to [mortenLCSGO](http://www.reddit.com/user/mortenLCSGO) for his input regarding the UI
 
 Many Thanks to moritzuehling / flai / [Fs0i](http://www.reddit.com/user/Fs0i) for his prompt help with demoinfogo
