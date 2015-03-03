@@ -25,13 +25,20 @@ namespace CSharpBoiler
         Thread loginThread;
         public delegate void LoggedIn(long steamID);
         public static event LoggedIn LoggedInEvent;
-        private long steamID;
 
         public LoginWindow()
         {
             InitializeComponent();
 
+            MouseDown += Window_MouseDown;
         }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -83,6 +90,11 @@ namespace CSharpBoiler
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             Login();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

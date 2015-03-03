@@ -44,6 +44,7 @@ using SteamKit2.GC;
 using SteamKit2.GC.CSGO.Internal;
 using System.Threading;
 using ICSharpCode.SharpZipLib.BZip2;
+using System.Xml.Serialization;
 
 namespace CSharpBoiler
 {
@@ -54,25 +55,64 @@ namespace CSharpBoiler
     {
         private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
         private AdditionalDemoData additionalDemoData = new AdditionalDemoData();
-        Thread mainCSGOThread;
         private long steamID;
         private const string DEMOFOLDER = "Demos/";
+        private const string DATAENDING = ".dat";
+        //Object where we store the matchList, combbination of .dat file and CSGO retrieval
+        CMsgGCCStrike15_v2_MatchList mainMatchList;
 
+        #region Constructor
         public MainWindow(long tempSteamID)
         {
             InitializeComponent();
+
             steamID = tempSteamID;
             MainGrid.DataContext = this;
+            MouseDown += Window_MouseDown;
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            //Binding the table to the dataObject
             MainDataGrid.ItemsSource = matchDataList;
+            //Disabling selection on the table
             MainDataGrid.SelectionChanged += (obj, ev) =>
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             MainDataGrid.UnselectAll()));
 
-            //DemoCommentsDeserialization
+            //Deserialize our stored data
+            DeserializeMatchData();
+            DeserializeAdditionalDemoData();
+            
+            //Starting a second thread to start a CSGOClient to request recent matchhistory, nonblocking
+            CSGOApp.CSGOClientWelcomeCallback = CSGOWelcomeEvent;
+            CSGOApp.CSGOMatchHistoryCallback = OnCSGOMatchDetails;
+            Thread csGOThread = new Thread(() => CSGOApp.LaunchClient());
+            csGOThread.Start();
+        }
+
+        private void DeserializeMatchData()
+        {
+            //Retrieving old matches
+            if (File.Exists(steamID + ".dat"))
+            {
+                FileStream datFileStream = new FileStream(steamID + ".dat", FileMode.Open, FileAccess.Read);
+                var tempMatchList = Serializer.Deserialize<CMsgGCCStrike15_v2_MatchList>(datFileStream);
+                datFileStream.Close();
+
+                mainMatchList = tempMatchList;
+            }
+        }
+
+        private void DeserializeAdditionalDemoData()
+        {
+            //AdditionalDemoDataDeserialization
             if (Directory.Exists(DEMOFOLDER))
             {
                 if (File.Exists("Demos/AdditionalDemoData.xml"))
@@ -86,15 +126,18 @@ namespace CSharpBoiler
                     streamReader.Close();
                 }
             }
-           
-            CSGOApp.CSGOClientWelcomeCallback = CSGOWelcomeEvent;
-            CSGOApp.CSGOMatchHistoryCallback = OnCSGOMatchDetails;
-            Thread csGOThread = new Thread(() => CSGOApp.LaunchClient());
-            csGOThread.Start();
         }
+        #endregion
 
+        #region CSGOEvents
+        //
+        // This Section handles Responses from the CSGOClient
+        //
+
+        //Handles CSGO Welcome Event
         void CSGOWelcomeEvent()
         {
+            //We start a second thread to get the Recent MatchHistory, nonblocking
             //CSGOApp.RequestMatchHistory(steamID);
             Thread myNewThread2 = new Thread(() => CSGOApp.RequestMatchHistory(steamID));
             myNewThread2.Start();
@@ -102,42 +145,24 @@ namespace CSharpBoiler
 
         void OnCSGOMatchDetails(IPacketGCMsg packetMsg)
         {
+            //Retrieving new matches
             ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList> matchListConstruct = new ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList>(packetMsg);
 
-            CMsgGCCStrike15_v2_MatchList matchList = matchListConstruct.Body;
+            //Adding the New Matches to our mainMatchList
+            if (mainMatchList == null)
+                mainMatchList = matchListConstruct.Body;
 
-            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(matchList, steamID); }));
-        }
-
-        //TODO Mix Downloaded with already have
-        /*
-        public void FillInData()
-        {
-            try
+            foreach (var match in matchListConstruct.Body.matches)
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "dat files (*.dat)|*.dat";
-                openFileDialog.ShowDialog();
-                FileStream dataFileStream;
-
-                dataFileStream = File.Open(openFileDialog.FileName, FileMode.Open);
-                steamID = openFileDialog.SafeFileName.Split('_')[0];
-
-                CMsgGCCStrike15_v2_MatchList.Builder matchListBuilder = new CMsgGCCStrike15_v2_MatchList.Builder();
-                CMsgGCCStrike15_v2_MatchList matchlist = matchListBuilder.MergeFrom(dataFileStream).Build();
-
-                dataFileStream.Close();
-
-                ParseMatchData(matchlist, steamID);
+                if(mainMatchList.matches.Single(i => i.matchid == match.matchid) == null)
+                    mainMatchList.matches.Add(match);
             }
-            catch (Exception e)
-            {
-                this.Close();
-            }
+
+            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
         }
-         */ 
+        #endregion
 
-        #region MatchData Parrsing
+        #region MatchData Parsing
         //
         // Databinding of the Table
         //
@@ -147,78 +172,88 @@ namespace CSharpBoiler
         {
             for (int i = matchlist.matches.Count - 1; i >= 0; i--)
             {
-                //Creating new MatchData
-                MatchData matchData = new MatchData();
-                //Date
-                matchData.Date = UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToString("yyyy-MM-dd hh:mm");
-                //Finding the Position of our own entries
-                int j = 0;
-                for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
+                try
                 {
-                    if (matchlist.matches[i].roundstats.reservation.account_ids[j] == (uint)steamID)
-                        break;
-                }
-                //Kills, Assists, Deaths, MVP, Score, KD, Demo
-                matchData.Kills = matchlist.matches[i].roundstats.kills[i];
-                matchData.Assists = matchlist.matches[i].roundstats.assists[i];
-                matchData.Deaths = matchlist.matches[i].roundstats.deaths[i];
-                matchData.MVPs = matchlist.matches[i].roundstats.mvps[i];
-                matchData.Score = matchlist.matches[i].roundstats.scores[i];
-                matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths)*100))/100);
-                matchData.Demo = matchlist.matches[i].roundstats.map; //new DemoButtonUserControl(matchlist.matches[i].roundstats.Map);
-                //Getting DemoComment, K3, K4, K5, HS
-                if (additionalDemoData.ContainsComment(matchData.Demo))
-                {
-                    matchData.DemoComment = additionalDemoData.GetComment(matchData.Demo);
-                }
-                if (additionalDemoData.ContainsK3(matchData.Demo))
-                {
-                    matchData.K3 = additionalDemoData.GetK3(matchData.Demo);
-                }
-                if (additionalDemoData.ContainsK4(matchData.Demo))
-                {
-                    matchData.K4 = additionalDemoData.GetK4(matchData.Demo);
-                }
-                if (additionalDemoData.ContainsK5(matchData.Demo))
-                {
-                    matchData.K5 = additionalDemoData.GetK5(matchData.Demo);
-                }
-                if (additionalDemoData.ContainsHS(matchData.Demo))
-                {
-                    matchData.HS = additionalDemoData.GetHS(matchData.Demo);
-                }
+
+                    //Creating new MatchData
+                    MatchData matchData = new MatchData();
+                    //Date
+                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToString("yyyy-MM-dd hh:mm");
+                    //Finding the Position of our own entries
+                    int j = 0;
+                    for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
+                    {
+                        if (matchlist.matches[i].roundstats.reservation.account_ids[j] == (uint)steamID)
+                            break;
+                    }
+                    //Kills, Assists, Deaths, MVP, Score, KD, Demo
+                    matchData.Kills = matchlist.matches[i].roundstats.kills[j];
+                    matchData.Assists = matchlist.matches[i].roundstats.assists[j];
+                    matchData.Deaths = matchlist.matches[i].roundstats.deaths[j];
+                    matchData.MVPs = matchlist.matches[i].roundstats.mvps[j];
+                    matchData.Score = matchlist.matches[i].roundstats.scores[j];
+
+                    if (matchData.Kills != 0 && matchData.Deaths != 0)
+                    {
+                        matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths) * 100)) / 100);
+                    }
+                    else
+                    {
+                        matchData.KD = 0;
+                    }
+
+                    matchData.Demo = matchlist.matches[i].roundstats.map; //new DemoButtonUserControl(matchlist.matches[i].roundstats.Map);
+
+                    //Getting DemoComment, K3, K4, K5, HS
+                    if (additionalDemoData.ContainsComment(matchData.Demo))
+                    {
+                        matchData.DemoComment = additionalDemoData.GetComment(matchData.Demo);
+                    }
+                    if (additionalDemoData.ContainsK3(matchData.Demo))
+                    {
+                        matchData.K3 = additionalDemoData.GetK3(matchData.Demo);
+                    }
+                    if (additionalDemoData.ContainsK4(matchData.Demo))
+                    {
+                        matchData.K4 = additionalDemoData.GetK4(matchData.Demo);
+                    }
+                    if (additionalDemoData.ContainsK5(matchData.Demo))
+                    {
+                        matchData.K5 = additionalDemoData.GetK5(matchData.Demo);
+                    }
+                    if (additionalDemoData.ContainsHS(matchData.Demo))
+                    {
+                        matchData.HS = additionalDemoData.GetHS(matchData.Demo);
+                    }
 
 
-                //Calculating if we won the match
-                if (j < matchlist.matches[i].roundstats.reservation.account_ids.Count / 2)
-                {
-                    //Overall Score, ex. 16:13
-                    matchData.Result = matchlist.matches[i].roundstats.team_scores[0].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[1].ToString();
-                    matchData.Won = (matchlist.matches[i].roundstats.team_scores[0] > matchlist.matches[i].roundstats.team_scores[1]);
-                }
-                else
-                {
-                    //Overall Score, ex. 16:13
-                    matchData.Result = matchlist.matches[i].roundstats.team_scores[1].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[0].ToString();
-                    matchData.Won = (matchlist.matches[i].roundstats.team_scores[1] > matchlist.matches[i].roundstats.team_scores[0]);
-                }
+                    //Calculating if we won the match
+                    if (j < matchlist.matches[i].roundstats.reservation.account_ids.Count / 2)
+                    {
+                        //Overall Score, ex. 16:13
+                        matchData.Result = matchlist.matches[i].roundstats.team_scores[0].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[1].ToString();
+                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[0] > matchlist.matches[i].roundstats.team_scores[1]);
+                    }
+                    else
+                    {
+                        //Overall Score, ex. 16:13
+                        matchData.Result = matchlist.matches[i].roundstats.team_scores[1].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[0].ToString();
+                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[1] > matchlist.matches[i].roundstats.team_scores[0]);
+                    }
 
-                //Calculating if we downloaded the Demo
-                string[] tempURLSplit = matchData.Demo.Split('/');
-                string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
+                    //Calculating if we downloaded the Demo
+                    string[] tempURLSplit = matchData.Demo.Split('/');
+                    string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                    matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
 
-                //adding to the MainList of MatchData
-                matchDataList.Add(matchData);
+                    //adding to the MainList of MatchData
+                    matchDataList.Add(matchData);
+                }
+                catch(Exception e)
+                {
+                    Console.Write(e.StackTrace);
+                }
             }
-        }
-
-        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
-        {
-            // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
         }
 
         #endregion
@@ -256,11 +291,10 @@ namespace CSharpBoiler
         {
             await Task.Run(() =>
             {
-                foreach(var matchData in matchDataList)
-                {
-                    if (matchData.Demo == URL)
-                        matchData.DownloadProgress = e.ProgressPercentage;
-                }
+                var matchData = matchDataList.SingleOrDefault(i => i.Demo == URL);
+                if (matchData != null)
+                    matchData.DownloadProgress = e.ProgressPercentage;
+
             }).ConfigureAwait(continueOnCapturedContext: false);
         }
 
@@ -271,7 +305,7 @@ namespace CSharpBoiler
                 UnZipDemo(tempDemoFileName);
 
                 UpdateDownloadedList();
-            }).ConfigureAwait(continueOnCapturedContext: false);        
+            }).ConfigureAwait(continueOnCapturedContext: false);
         }
 
         private void UnZipDemo(string zippedDemoName)
@@ -279,14 +313,14 @@ namespace CSharpBoiler
             if (Directory.Exists(DEMOFOLDER))
             {
                 if (File.Exists(DEMOFOLDER + zippedDemoName) && zippedDemoName.Substring(zippedDemoName.Length - 4, 4) == ".bz2" && !File.Exists(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4)))
-                    {
-                        FileStream inputStream = File.Open(DEMOFOLDER + zippedDemoName, FileMode.Open, FileAccess.Read);
-                        //- .bz2
-                        FileStream outputStream = File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
-                        BZip2.Decompress(inputStream, outputStream, true);
-                        inputStream.Close();
-                        outputStream.Close();
-                    }
+                {
+                    FileStream inputStream = File.Open(DEMOFOLDER + zippedDemoName, FileMode.Open, FileAccess.Read);
+                    //- .bz2
+                    FileStream outputStream = File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
+                    BZip2.Decompress(inputStream, outputStream, true);
+                    inputStream.Close();
+                    outputStream.Close();
+                }
             }
         }
 
@@ -311,7 +345,7 @@ namespace CSharpBoiler
 
             MatchData tempMatchData = GetMatchData(url);
 
-            if(!tempMatchData.Downloaded)
+            if (!tempMatchData.Downloaded)
             {
                 MessageBox.Show("Demo is not (fully) Downloaded or Unzipped, please wait a second or Start the Download if you didn't already do so.");
                 return;
@@ -323,13 +357,8 @@ namespace CSharpBoiler
         }
 
         public MatchData GetMatchData(string demoURL)
-        { 
-            foreach(var matchData in matchDataList)
-            {
-                if(matchData.Demo == demoURL)
-                    return matchData;
-            }
-            return null;
+        {
+            return matchDataList.SingleOrDefault(i => i.Demo == demoURL);
         }
 
         #region Closing & Demo Comment Serialization
@@ -339,20 +368,22 @@ namespace CSharpBoiler
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            //DemoCommentsSerialization
+            //AdditionalDemoDataSerialization
             ExtractAdditionalDemoData();
 
             if (!Directory.Exists(DEMOFOLDER))
                 Directory.CreateDirectory(DEMOFOLDER);
 
-            System.Xml.Serialization.XmlSerializer xmlWriter =
-            new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
+            XmlSerializer xmlWriter = new XmlSerializer(typeof(AdditionalDemoData));
 
-            System.IO.StreamWriter streamWriter = new System.IO.StreamWriter(
-            "Demos/AdditionalDemoData.xml");
-            xmlWriter.Serialize(streamWriter, additionalDemoData);
+            StreamWriter additionalDemoDataStreamWriter = new StreamWriter(DEMOFOLDER + "AdditionalDemoData.xml");
+            xmlWriter.Serialize(additionalDemoDataStreamWriter, additionalDemoData);
+            additionalDemoDataStreamWriter.Close();
 
-            streamWriter.Close();
+            //DAT file Serialization
+            FileStream datFileStream = new FileStream(steamID + DATAENDING, FileMode.OpenOrCreate, FileAccess.Write);
+            Serializer.Serialize<CMsgGCCStrike15_v2_MatchList>(datFileStream, mainMatchList);
+            datFileStream.Close();
 
             Application.Current.Shutdown(1);
         }
@@ -361,27 +392,27 @@ namespace CSharpBoiler
         {
             foreach (MatchData tempMatchData in matchDataList)
             {
-                if(tempMatchData.DemoComment != null)
+                if (tempMatchData.DemoComment != null && tempMatchData.DemoComment != "")
                 {
                     additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
                 }
 
-                if (tempMatchData.K3 != null)
+                if (tempMatchData.K3 != 0)
                 {
                     additionalDemoData.AddK3(tempMatchData.Demo, tempMatchData.K3);
                 }
 
-                if (tempMatchData.K4 != null)
+                if (tempMatchData.K4 != 0)
                 {
                     additionalDemoData.AddK4(tempMatchData.Demo, tempMatchData.K4);
                 }
 
-                if (tempMatchData.K5 != null)
+                if (tempMatchData.K5 != 0)
                 {
                     additionalDemoData.AddK5(tempMatchData.Demo, tempMatchData.K5);
                 }
 
-                if (tempMatchData.HS != null)
+                if (tempMatchData.HS != 0)
                 {
                     additionalDemoData.AddHS(tempMatchData.Demo, tempMatchData.HS);
                 }
@@ -389,6 +420,9 @@ namespace CSharpBoiler
         }
         #endregion
 
-
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

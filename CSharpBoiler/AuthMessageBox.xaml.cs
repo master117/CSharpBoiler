@@ -22,6 +22,14 @@ namespace CSharpBoiler
         public AuthMessageBox()
         {
             InitializeComponent();
+
+            MouseDown += Window_MouseDown;
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
         }
 
         public string ResponseText {

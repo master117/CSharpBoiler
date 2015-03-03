@@ -31,15 +31,39 @@ namespace CSharpBoiler
     /// </summary>
     public partial class App : Application
     {
+        LoginWindow startWindow;
+        MainWindow mainWindow;
+        bool LoggedIn = false;
+
         public App()
         {
             LoginWindow.LoggedInEvent += LoginWindow_LoggedInEvent;
+
+            startWindow = new LoginWindow();
+            startWindow.Closed += LoginWindow_Closed;
+            startWindow.Show();
         }
 
         void LoginWindow_LoggedInEvent(long steamID)
         {
-            MainWindow mainWindow = new MainWindow(steamID);
+            LoggedIn = true;
+
+            mainWindow = new MainWindow(steamID);
+            mainWindow.Closed += MainWindow_Closed;
             mainWindow.Show();
+
+            startWindow.Close();
+        }
+
+        void LoginWindow_Closed(object sender, EventArgs e)
+        {
+            if (!LoggedIn)
+                Environment.Exit(0);
+        }
+
+        void MainWindow_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
         
     }

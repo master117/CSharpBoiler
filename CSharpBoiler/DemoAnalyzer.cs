@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using DemoInfo;
+using DemoModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,6 +37,7 @@ namespace CSharpBoiler
         Player mainPlayer;
         DemoParser demoParser;
         private const long VOLVOMAGICNUMBER = 76561197960265728;
+        public Demo mainDemo;
 
         //Parameters for Start->End calculations
         int K3 = 0;
@@ -57,6 +59,8 @@ namespace CSharpBoiler
 
             //Volvo Magic Number
             mainSteamID64Basis = mainSteamID + VOLVOMAGICNUMBER;
+
+            mainDemo = new Demo();
         }
 
         public async Task<bool> Analyze()
@@ -98,7 +102,7 @@ namespace CSharpBoiler
                 mainMatchData.K3 = K3;
                 mainMatchData.K4 = K4;
                 mainMatchData.K5 = K5;
-                if (headShots != 0)
+                if (headShots != 0 && matchKills != 0)
                     mainMatchData.HS = (int)((double)headShots / (double)matchKills * 100.0);
                 else
                     mainMatchData.HS = 0;

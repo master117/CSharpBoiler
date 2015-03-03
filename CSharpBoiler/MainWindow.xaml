@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:CSharpBoiler"
         Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="950"
-        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Ico/Boiler.ico">
+        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Ico/Boiler.ico"
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
         <m:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
@@ -63,6 +64,16 @@
             </DataTemplate>
         </Grid.Resources>
 
+        <StackPanel Background="Black">
+            <DockPanel Margin="5" >
+                <Image Source="Images/BoilerStyl2P4_48x48.png" Height="48" Width="48" HorizontalAlignment="Left" Margin="-5" />
+                <TextBlock Text="CSharpBoiler" FontSize="26" Background="Transparent" VerticalAlignment="Center" FontFamily="Century Gothic" Foreground="White" />
+                <Button Name="CloseButton" Click="CloseButton_Click" Content="x" 
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-10,0,0"
+                Background="Transparent" BorderBrush="Transparent" BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
+                FontWeight="Bold" Foreground="White" FontFamily="Century Gothic" FontSize="32" Width="32" Height="38" />
+            </DockPanel>
+
         <DataGrid
             PresentationTraceSources.TraceLevel="High"
             AutoGenerateColumns="False"
@@ -92,5 +103,6 @@
                 <DataGridTextColumn Header="HS%" IsReadOnly="True" Binding="{Binding HS}"  />
             </DataGrid.Columns>
         </DataGrid>
+        </StackPanel>
     </Grid>
 </Window>
