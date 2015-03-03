@@ -45,6 +45,7 @@ using SteamKit2.GC.CSGO.Internal;
 using System.Threading;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Xml.Serialization;
+using CSharpBoiler.Helpers;
 
 namespace CSharpBoiler
 {
@@ -154,7 +155,7 @@ namespace CSharpBoiler
 
             foreach (var match in matchListConstruct.Body.matches)
             {
-                if(mainMatchList.matches.Single(i => i.matchid == match.matchid) == null)
+                if(!mainMatchList.matches.Contains(match, new MatchComparer()))
                     mainMatchList.matches.Add(match);
             }
 

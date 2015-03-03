@@ -134,6 +134,7 @@
     <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="AdditionalDemoData.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\MatchComparer.cs" />
     <Compile Include="Helpers\TimeHelper.cs" />
     <Compile Include="IsLessThanConverter.cs" />
     <Compile Include="LoginWindow.xaml.cs">
@@ -183,7 +184,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="DemoModelsDiagram.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

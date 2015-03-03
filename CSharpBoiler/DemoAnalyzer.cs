@@ -34,7 +34,7 @@ namespace CSharpBoiler
         long mainSteamID;
         long mainSteamID64Basis;
         int mainPlayerID;
-        Player mainPlayer;
+        DemoInfo.Player mainPlayer;
         DemoParser demoParser;
         private const long VOLVOMAGICNUMBER = 76561197960265728;
         public Demo mainDemo;
@@ -82,6 +82,7 @@ namespace CSharpBoiler
                 demoParser.PlayerKilled += HandlePlayerKilled;
                 demoParser.WeaponFired += HandleWeaponFired;
                 demoParser.RoundStart += demoParser_RoundStart;
+
 
                 demoParser.ParseHeader();
 
