@@ -13,17 +13,6 @@ namespace DemoModel
 
 	public class Kevlar : Item
 	{
-        public int price
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
+	}
 }
 

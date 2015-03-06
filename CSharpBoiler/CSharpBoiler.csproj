@@ -80,7 +80,7 @@
   <ItemGroup>
     <Reference Include="DemoInfo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dc7de83c756ec63d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\DemoInfo.1.0.1\lib\net45\DemoInfo.dll</HintPath>
+      <HintPath>..\..\demoinfo-public\DemoInfo\bin\Release\DemoInfo.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\ICSharpCode.SharpZipLib.Patched.0.86.4\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -133,10 +133,17 @@
     </Compile>
     <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="AdditionalDemoData.cs" />
+    <Compile Include="DemoModel\Buy.cs" />
+    <Compile Include="DemoModel\Demo.cs" />
+    <Compile Include="DemoModel\Item.cs" />
+    <Compile Include="DemoModel\KillEvent.cs" />
+    <Compile Include="DemoModel\Player.cs" />
+    <Compile Include="DemoModel\Round.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\MatchComparer.cs" />
     <Compile Include="Helpers\TimeHelper.cs" />
     <Compile Include="IsLessThanConverter.cs" />
+    <Compile Include="LoginDataModel.cs" />
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -206,12 +213,6 @@
     <Resource Include="Images\BoilerStyl2P4.png" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <ProjectReference Include="..\DemoMPLib\DemoMPLib.csproj">
-      <Project>{d783aa6f-ecad-4824-9248-586bfaa89f9f}</Project>
-      <Name>DemoMPLib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

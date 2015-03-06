@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using DemoInfo;
-using DemoModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,7 +36,7 @@ namespace CSharpBoiler
         DemoInfo.Player mainPlayer;
         DemoParser demoParser;
         private const long VOLVOMAGICNUMBER = 76561197960265728;
-        public Demo mainDemo;
+
 
         //Parameters for Start->End calculations
         int K3 = 0;
@@ -59,8 +58,6 @@ namespace CSharpBoiler
 
             //Volvo Magic Number
             mainSteamID64Basis = mainSteamID + VOLVOMAGICNUMBER;
-
-            mainDemo = new Demo();
         }
 
         public async Task<bool> Analyze()
@@ -82,6 +79,8 @@ namespace CSharpBoiler
                 demoParser.PlayerKilled += HandlePlayerKilled;
                 demoParser.WeaponFired += HandleWeaponFired;
                 demoParser.RoundStart += demoParser_RoundStart;
+                demoParser.ItemBuy += demoParser_ItemBuy;
+
 
 
                 demoParser.ParseHeader();
@@ -110,6 +109,11 @@ namespace CSharpBoiler
 
                 return true;
             }).ConfigureAwait(continueOnCapturedContext: false);
+        }
+
+        void demoParser_ItemBuy(object sender, ItemBuyEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         //Most Calculation will be done here

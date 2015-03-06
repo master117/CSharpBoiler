@@ -19,18 +19,6 @@ namespace DemoModel
 			set;
 		}
 
-
-        public int price
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
+	}
 }
 

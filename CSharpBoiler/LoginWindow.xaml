@@ -54,6 +54,7 @@
             <ext:WatermarkTextBox Name="UserNameTextBox" Watermark="Steam Login Name" FontSize="12" Height="22" Margin="5" />
             <PasswordBox Name="PasswordTextBox" FontSize="12" Height="22" Margin="5" />
             <Button Name="LoginButton" Content="Login" Click="LoginButton_Click" Margin="5" />
+            <CheckBox Name="AutoLoginCheckBox" Margin="5,10,0,0" Content="AutoLogin, save Login on PC" Foreground="White" Checked="AutoLoginCheckBox_OnChecked" FontFamily="Century Gothic" />
         </StackPanel>
         
         <Button Name="CloseButton" Click="CloseButton_Click" Content="x" 
