@@ -29,9 +29,6 @@ namespace CSharpBoiler
         public static event LoggedIn LoggedInEvent;
         public bool checkBoxChecked;
 
-        private LoginDataModel mainLoginDataModel = new LoginDataModel();
-
-
         public LoginWindow()
         {
             InitializeComponent();
@@ -52,14 +49,11 @@ namespace CSharpBoiler
             SteamApp.Need2FactorCallback = TwoFactorEvent;
             SteamApp.NeedAuthCodeCallback = AuthCodeEvent;
 
-            DeserializeLoginData();
-
-            if (mainLoginDataModel != null && mainLoginDataModel.username != null && mainLoginDataModel.password != null)
+            if (StartCheckBoxesUserControlInstance.IsAutoLoginEnabled())
             {
-                UserNameTextBox.Text = mainLoginDataModel.username;
-                PasswordTextBox.Password = mainLoginDataModel.password;
+                UserNameTextBox.Text = StartCheckBoxesUserControlInstance.LoginDataModel.username;
+                PasswordTextBox.Password = StartCheckBoxesUserControlInstance.LoginDataModel.password;
 
-                AutoLoginCheckBox.IsChecked = true;
                 Login();
             }
         }
@@ -67,11 +61,10 @@ namespace CSharpBoiler
         public void Login()
         {
             //SteamApp.Login(UserNameTextBox.Text, PasswordTextBox.Text);
+            StartCheckBoxesUserControlInstance.LoginDataModel.username = UserNameTextBox.Text;
+            StartCheckBoxesUserControlInstance.LoginDataModel.password = PasswordTextBox.Password;
 
-            mainLoginDataModel.username = UserNameTextBox.Text;
-            mainLoginDataModel.password = PasswordTextBox.Password;
-
-            loginThread = new Thread(() => SteamApp.Login(mainLoginDataModel.username, mainLoginDataModel.password));
+            loginThread = new Thread(() => SteamApp.Login(StartCheckBoxesUserControlInstance.LoginDataModel.username, StartCheckBoxesUserControlInstance.LoginDataModel.password));
             loginThread.SetApartmentState(ApartmentState.STA);
             loginThread.Start();
         }
@@ -99,48 +92,14 @@ namespace CSharpBoiler
         void LoggedOnEvent()
         {
             //loginThread.Suspend();
-            if (checkBoxChecked)
-            {
-                SerializeLoginData();  
-            }
-            else
-            {
-                if (File.Exists("CSharpBoilerLogin"))
-                    File.Delete("CSharpBoilerLogin");   
-            }
 
-            Application.Current.Dispatcher.Invoke(new Action(() => { LoggedInEvent(SteamApp.steamUser.SteamID.AccountID); }));
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                StartCheckBoxesUserControlInstance.StoreLogin(); 
+                LoggedInEvent(SteamApp.steamUser.SteamID.AccountID);
+            }));
 
             //LoggedInEvent(SteamApp.steamUser.SteamID.AccountID);            
-        }
-
-        private void SerializeLoginData()
-        {
-            //Retrieving old matches
-            if (File.Exists("CSharpBoilerLogin.xml"))
-                File.Delete("CSharpBoilerLogin.xml");
-
-            XmlSerializer xmlWriter = new XmlSerializer(typeof(LoginDataModel));
-
-            StreamWriter loginDataStreamWriter = new StreamWriter("CSharpBoilerLogin.xml");
-            xmlWriter.Serialize(loginDataStreamWriter, mainLoginDataModel);
-            loginDataStreamWriter.Close();
-        }
-
-        private void DeserializeLoginData()
-        {
-            if (File.Exists("CSharpBoilerLogin.xml"))
-            {
-                System.Xml.Serialization.XmlSerializer xmlReader =
-                    new System.Xml.Serialization.XmlSerializer(typeof(LoginDataModel));
-                System.IO.StreamReader loginDataStreamReader = new System.IO.StreamReader(
-                    "CSharpBoilerLogin.xml");
-                LoginDataModel tempLoginDataModel = (LoginDataModel)xmlReader.Deserialize(loginDataStreamReader);
-
-                loginDataStreamReader.Close();
-
-                mainLoginDataModel = tempLoginDataModel;
-            }
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -151,11 +110,6 @@ namespace CSharpBoiler
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
-        }
-
-        private void AutoLoginCheckBox_OnChecked(object sender, RoutedEventArgs e)
-        {
-            checkBoxChecked = (AutoLoginCheckBox.IsChecked == true);
         }
     }
 }

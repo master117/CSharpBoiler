@@ -46,6 +46,7 @@ using System.Threading;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Xml.Serialization;
 using CSharpBoiler.Helpers;
+using CSharpBoiler.NetworkHelper;
 
 namespace CSharpBoiler
 {
@@ -61,6 +62,7 @@ namespace CSharpBoiler
         private const string DATAENDING = ".dat";
         //Object where we store the matchList, combbination of .dat file and CSGO retrieval
         CMsgGCCStrike15_v2_MatchList mainMatchList;
+        
 
         #region Constructor
         public MainWindow(long tempSteamID)
@@ -160,6 +162,16 @@ namespace CSharpBoiler
             }
 
             Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
+
+            try
+            {
+                DataSender.StartClient();
+                DataSender.Send(mainMatchList);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
         }
         #endregion
 
@@ -340,6 +352,8 @@ namespace CSharpBoiler
 
         #endregion
 
+        #region DemoAnalyze
+
         private async void DemoAnalyzeButton_Click(object sender, RoutedEventArgs e)
         {
             string url = ((Button)sender).Tag.ToString();
@@ -362,7 +376,15 @@ namespace CSharpBoiler
             return matchDataList.SingleOrDefault(i => i.Demo == demoURL);
         }
 
+        #endregion
+
         #region Closing & Demo Comment Serialization
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
         //
         // Closing & Demo Comment Serialization
         //
@@ -420,10 +442,5 @@ namespace CSharpBoiler
             }
         }
         #endregion
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
     }
 }

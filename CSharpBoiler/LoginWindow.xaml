@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ext="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:CSharpBoiler="clr-namespace:CSharpBoiler"
-        Title="LoginWindow" Height="300" Width="300" Loaded="Window_Loaded" Icon="Ico/Boiler.ico" 
+        xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
+        Title="LoginWindow" Height="400" Width="400" Loaded="Window_Loaded" Icon="Ico/Boiler.ico" 
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
         <Style x:Key="{x:Type PasswordBox}"
@@ -54,12 +55,14 @@
             <ext:WatermarkTextBox Name="UserNameTextBox" Watermark="Steam Login Name" FontSize="12" Height="22" Margin="5" />
             <PasswordBox Name="PasswordTextBox" FontSize="12" Height="22" Margin="5" />
             <Button Name="LoginButton" Content="Login" Click="LoginButton_Click" Margin="5" />
-            <CheckBox Name="AutoLoginCheckBox" Margin="5,10,0,0" Content="AutoLogin, save Login on PC" Foreground="White" Checked="AutoLoginCheckBox_OnChecked" FontFamily="Century Gothic" />
+            <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" />
         </StackPanel>
         
         <Button Name="CloseButton" Click="CloseButton_Click" Content="x" 
                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-10,0,0"
                 Background="Transparent" BorderBrush="Transparent" BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
                 FontWeight="Bold" Foreground="White" FontFamily="Century Gothic" FontSize="32" Width="32" Height="38" />
+        
+        
     </Grid>
 </Window>
