@@ -163,10 +163,13 @@ namespace CSharpBoiler
 
             Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
 
+            //
+            // Sending MatchList to Server for Statistic Purposes, disabled in the current Binary!!
+            // TODO enable
             try
             {
-                DataSender.StartClient();
-                DataSender.Send(mainMatchList);
+                //DataSender.StartClient();
+                //DataSender.Send(mainMatchList);
             }
             catch (Exception e)
             {
