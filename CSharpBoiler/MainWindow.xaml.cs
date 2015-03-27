@@ -168,8 +168,8 @@ namespace CSharpBoiler
             // TODO enable
             try
             {
-                //DataSender.StartClient();
-                //DataSender.Send(mainMatchList);
+                DataSender.StartClient();
+                DataSender.Send(mainMatchList);
             }
             catch (Exception e)
             {
