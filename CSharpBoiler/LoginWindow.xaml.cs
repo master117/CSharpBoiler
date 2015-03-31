@@ -95,6 +95,7 @@ namespace CSharpBoiler
 
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
+                StartCheckBoxesUserControlInstance.IsAutoLoginEnabled();
                 StartCheckBoxesUserControlInstance.StoreLogin(); 
                 LoggedInEvent(SteamApp.steamUser.SteamID.AccountID);
             }));

@@ -44,7 +44,10 @@ namespace CSharpBoiler.UIControls
 
             DeserializeLoginData();
 
-            if (LoginDataModel != null)
+            if(LoginDataModel == null)
+                LoginDataModel = new LoginDataModel();
+
+            if (LoginDataModel.username != null)
                 AutoLoginCheckBox.IsChecked = true;
 
             if (IsStartupItem())
@@ -65,10 +68,7 @@ namespace CSharpBoiler.UIControls
 
         public void StoreLogin()
         {
-            if (AutoLoginCheckBox.IsChecked == true)
-            {
                 SerializeLoginData();
-            }
         }
 
         private void SerializeLoginData()

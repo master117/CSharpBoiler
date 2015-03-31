@@ -28,7 +28,7 @@ namespace CSharpBoiler.NetworkHelper
 
 
         // Establish the remote endpoint for the socket.
-        private static string ipAddress = "192.168.1.107";
+        private static string ipAddress = "85.214.126.53"; //"http://boiler-stats.com";
         // The port number for the remote device.
         private const int port = 8088;
 
@@ -52,27 +52,7 @@ namespace CSharpBoiler.NetworkHelper
             }
         }
 
-        private static void ConnectCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the socket from the state object.
-                Socket client = (Socket)ar.AsyncState;
 
-                // Complete the connection.
-                client.EndConnect(ar);
-
-                Console.WriteLine("Socket connected to {0}",
-                    client.RemoteEndPoint.ToString());
-
-                // Signal that the connection has been made.
-                connectDone.Set();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
 
         public static void StopClient()
         {
@@ -102,8 +82,13 @@ namespace CSharpBoiler.NetworkHelper
             //ToString + adding of EOF tag
             string data = stringBase64 + EOFstring;
 
+            Console.WriteLine("Sending over Socket..."); 
+
             SendOverSocket(socketClient, data);
             sendDone.WaitOne();
+
+            Console.WriteLine("Success..."); 
+            Console.WriteLine("Receiving Response..."); 
 
             // Receive the response from the remote device.
             Receive(socketClient);
@@ -113,6 +98,27 @@ namespace CSharpBoiler.NetworkHelper
             Console.WriteLine("Response received : {0}", response); 
         }
 
+        private static void ConnectCallback(IAsyncResult ar)
+        {
+            try
+            {
+                // Retrieve the socket from the state object.
+                Socket client = (Socket)ar.AsyncState;
+
+                // Complete the connection.
+                client.EndConnect(ar);
+
+                Console.WriteLine("Socket connected to {0}",
+                    client.RemoteEndPoint.ToString());
+
+                // Signal that the connection has been made.
+                connectDone.Set();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
 
         private static void SendOverSocket(Socket client, String data)
         {

@@ -411,6 +411,10 @@ namespace CSharpBoiler
             Serializer.Serialize<CMsgGCCStrike15_v2_MatchList>(datFileStream, mainMatchList);
             datFileStream.Close();
 
+            //Login Data Serialization
+            if(StartCheckBoxesUserControlInstance.IsAutoLoginEnabled())
+                StartCheckBoxesUserControlInstance.StoreLogin();
+
             Application.Current.Shutdown(1);
         }
 
