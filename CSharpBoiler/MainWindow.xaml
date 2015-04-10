@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:CSharpBoiler"
         xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
-        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="950"
+        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="925"
         DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Ico/Boiler.ico"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
@@ -57,7 +57,7 @@
             <DataTemplate x:Key="AnalyzeTemplate" >
                 <Grid>
                     <ProgressBar x:Name="DemoAnalyzeButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" />
-                    <Button x:Name="DemoAnalyzeButton" Content="Analyze" Tag="{Binding Demo}" Style="{StaticResource AnalyzeButtonStyle}" Width="100" Click="DemoAnalyzeButton_Click" />
+                    <Button x:Name="DemoAnalyzeButton" Content="Analyse" Tag="{Binding Demo}" Style="{StaticResource AnalyzeButtonStyle}" Width="100" Click="DemoAnalyzeButton_Click" />
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="DemoCommentTemplate" >
@@ -79,7 +79,9 @@
             PresentationTraceSources.TraceLevel="High"
             AutoGenerateColumns="False"
             HorizontalAlignment="Stretch" 
-            Name="MainDataGrid" 
+            Name="MainDataGrid"
+            VerticalScrollBarVisibility="Auto"
+            MaxHeight="600"
             VerticalAlignment="Top"
             CanUserAddRows="False"
             RowHeaderWidth="0">
@@ -95,7 +97,7 @@
                     <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
 
                     <DataGridTemplateColumn Header="Demo" CellTemplate="{StaticResource DemoTemplate}" />
-                    <DataGridTemplateColumn Header="Analyze" CellTemplate="{StaticResource AnalyzeTemplate}" />
+                    <DataGridTemplateColumn Header="Analyse" CellTemplate="{StaticResource AnalyzeTemplate}" />
                     <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
 
                     <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}"  />

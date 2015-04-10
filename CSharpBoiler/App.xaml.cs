@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -31,34 +32,28 @@ namespace CSharpBoiler
     /// </summary>
     public partial class App : Application
     {
-        LoginWindow startWindow;
-        MainWindow mainWindow;
-        bool LoggedIn = false;
-
         public App()
         {
-            LoginWindow.LoggedInEvent += LoginWindow_LoggedInEvent;
+            int steamID = StartBoiler.StartAndGetSteamID();
 
-            startWindow = new LoginWindow();
-            startWindow.Closed += LoginWindow_Closed;
-            startWindow.Show();
-        }
+            if (steamID == 0)
+            {
+                MessageBox.Show("Steam must be running for CSharpBoiler to work.\n Open Steam and close this MessageBox afterwards.");
+                steamID = StartBoiler.StartAndGetSteamID();
+            }
 
-        void LoginWindow_LoggedInEvent(long steamID)
-        {
-            LoggedIn = true;
+            if (steamID == 0)
+            {
+                MessageBox.Show("Still no running SteamClient found. Closing.");
+                Environment.Exit(1);
+            }
 
-            mainWindow = new MainWindow(steamID);
-            mainWindow.Closed += MainWindow_Closed;
-            mainWindow.Show();
-
-            startWindow.Close();
-        }
-
-        void LoginWindow_Closed(object sender, EventArgs e)
-        {
-            if (!LoggedIn)
-                Environment.Exit(0);
+            if (steamID != 0)
+            {
+                var mainWindow = new MainWindow(steamID);
+                mainWindow.Closed += MainWindow_Closed;
+                mainWindow.Show();
+            }
         }
 
         void MainWindow_Closed(object sender, EventArgs e)

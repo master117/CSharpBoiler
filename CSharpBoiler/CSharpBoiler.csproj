@@ -128,9 +128,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AuthMessageBox.xaml.cs">
-      <DependentUpon>AuthMessageBox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="AdditionalDemoData.cs" />
     <Compile Include="DemoModel\Buy.cs" />
@@ -143,29 +140,15 @@
     <Compile Include="Helpers\MatchComparer.cs" />
     <Compile Include="Helpers\TimeHelper.cs" />
     <Compile Include="IsLessThanConverter.cs" />
-    <Compile Include="LoginDataModel.cs" />
-    <Compile Include="LoginWindow.xaml.cs">
-      <DependentUpon>LoginWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MatchData.cs" />
-    <Compile Include="NetworkHelper\DataSender.cs" />
-    <Compile Include="NetworkHelper\StateObject.cs" />
-    <Compile Include="ServerUploader.cs" />
+    <Compile Include="NetworkHelper\UploadedDemoData.cs" />
+    <Compile Include="NetworkHelper\MatchLinkSender.cs" />
+    <Compile Include="StartBoiler.cs" />
     <Compile Include="UIControls\PasswordBoxMonitor.cs" />
     <Compile Include="SerializableDictionary.cs" />
-    <Compile Include="SteamConnection\CSGOApp.cs" />
-    <Compile Include="SteamConnection\SteamApp.cs" />
     <Compile Include="UIControls\StartCheckBoxesUserControl.xaml.cs">
       <DependentUpon>StartCheckBoxesUserControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="AuthMessageBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="LoginWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

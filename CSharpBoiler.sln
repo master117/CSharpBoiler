@@ -9,8 +9,6 @@ Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "DemoMP", "DemoMP\DemoMP.mod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoMPLib", "DemoMPLib\DemoMPLib.csproj", "{D783AA6F-ECAD-4824-9248-586BFAA89F9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpBoilerServer", "CSharpBoilerServer\CSharpBoilerServer.csproj", "{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpBoilerAutoStarter", "CSharpBoilerAutoStarter\CSharpBoilerAutoStarter.csproj", "{C2708F6F-1CDE-4764-AA68-8C22D64EB90A}"
 EndProject
 Global
@@ -51,14 +49,6 @@ Global
 		{D783AA6F-ECAD-4824-9248-586BFAA89F9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D783AA6F-ECAD-4824-9248-586BFAA89F9F}.Release|x64.ActiveCfg = Release|Any CPU
 		{D783AA6F-ECAD-4824-9248-586BFAA89F9F}.Release|x86.ActiveCfg = Release|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Release|x64.ActiveCfg = Release|Any CPU
-		{E2B5B513-5ACD-4D17-A519-75F9BFB9E4F0}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2708F6F-1CDE-4764-AA68-8C22D64EB90A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2708F6F-1CDE-4764-AA68-8C22D64EB90A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2708F6F-1CDE-4764-AA68-8C22D64EB90A}.Debug|x64.ActiveCfg = Debug|Any CPU

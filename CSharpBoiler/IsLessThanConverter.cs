@@ -15,11 +15,6 @@ namespace CSharpBoiler
             int parameterInt;
             int.TryParse((string)parameter, out parameterInt);
 
-            if((int)value == 100)
-            {
-                Console.Write("WoW");
-            }
-
             return ((int)value < (int)parameterInt);
         }
 

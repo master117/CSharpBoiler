@@ -60,7 +60,7 @@ namespace CSharpBoiler
             mainSteamID64Basis = mainSteamID + VOLVOMAGICNUMBER;
         }
 
-        public async Task<bool> Analyze()
+        public async Task<bool> Analyse()
         {
             return await Task.Run(() =>
             {
@@ -80,8 +80,6 @@ namespace CSharpBoiler
                 demoParser.WeaponFired += HandleWeaponFired;
                 demoParser.RoundStart += demoParser_RoundStart;
                 demoParser.ItemBuy += demoParser_ItemBuy;
-
-
 
                 demoParser.ParseHeader();
 

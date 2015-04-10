@@ -60,8 +60,10 @@ namespace CSharpBoiler
         private long steamID;
         private const string DEMOFOLDER = "Demos/";
         private const string DATAENDING = ".dat";
+        private const string MATCHLISTTAG = "_matchlist";
+        private const string ADDITIONALDEMODATAFILE = "AdditionalDemoData.xml";
         //Object where we store the matchList, combbination of .dat file and CSGO retrieval
-        CMsgGCCStrike15_v2_MatchList mainMatchList;
+        private CMsgGCCStrike15_v2_MatchList mainMatchList;
         
 
         #region Constructor
@@ -92,20 +94,29 @@ namespace CSharpBoiler
             //Deserialize our stored data
             DeserializeMatchData();
             DeserializeAdditionalDemoData();
-            
-            //Starting a second thread to start a CSGOClient to request recent matchhistory, nonblocking
-            CSGOApp.CSGOClientWelcomeCallback = CSGOWelcomeEvent;
-            CSGOApp.CSGOMatchHistoryCallback = OnCSGOMatchDetails;
-            Thread csGOThread = new Thread(() => CSGOApp.LaunchClient());
-            csGOThread.Start();
+
+            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
+
+            //
+            // Sending MatchList to Server for Statistic Purposes
+            //
+            try
+            {
+                MatchLinkSender matchLinkSender = new MatchLinkSender(mainMatchList);
+                matchLinkSender.Send();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void DeserializeMatchData()
         {
             //Retrieving old matches
-            if (File.Exists(steamID + ".dat"))
+            if (File.Exists(steamID + MATCHLISTTAG + DATAENDING))
             {
-                FileStream datFileStream = new FileStream(steamID + ".dat", FileMode.Open, FileAccess.Read);
+                FileStream datFileStream = new FileStream(steamID + MATCHLISTTAG + DATAENDING, FileMode.Open, FileAccess.Read);
                 var tempMatchList = Serializer.Deserialize<CMsgGCCStrike15_v2_MatchList>(datFileStream);
                 datFileStream.Close();
 
@@ -118,62 +129,15 @@ namespace CSharpBoiler
             //AdditionalDemoDataDeserialization
             if (Directory.Exists(DEMOFOLDER))
             {
-                if (File.Exists("Demos/AdditionalDemoData.xml"))
+                if (File.Exists(DEMOFOLDER + ADDITIONALDEMODATAFILE))
                 {
                     System.Xml.Serialization.XmlSerializer xmlReader =
                     new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
-                    System.IO.StreamReader streamReader = new System.IO.StreamReader(
-                        "Demos/AdditionalDemoData.xml");
+                    System.IO.StreamReader streamReader = new System.IO.StreamReader(DEMOFOLDER + ADDITIONALDEMODATAFILE);
                     additionalDemoData = (AdditionalDemoData)xmlReader.Deserialize(streamReader);
 
                     streamReader.Close();
                 }
-            }
-        }
-        #endregion
-
-        #region CSGOEvents
-        //
-        // This Section handles Responses from the CSGOClient
-        //
-
-        //Handles CSGO Welcome Event
-        void CSGOWelcomeEvent()
-        {
-            //We start a second thread to get the Recent MatchHistory, nonblocking
-            //CSGOApp.RequestMatchHistory(steamID);
-            Thread myNewThread2 = new Thread(() => CSGOApp.RequestMatchHistory(steamID));
-            myNewThread2.Start();
-        }
-
-        void OnCSGOMatchDetails(IPacketGCMsg packetMsg)
-        {
-            //Retrieving new matches
-            ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList> matchListConstruct = new ClientGCMsgProtobuf<CMsgGCCStrike15_v2_MatchList>(packetMsg);
-
-            //Adding the New Matches to our mainMatchList
-            if (mainMatchList == null)
-                mainMatchList = matchListConstruct.Body;
-
-            foreach (var match in matchListConstruct.Body.matches)
-            {
-                if(!mainMatchList.matches.Contains(match, new MatchComparer()))
-                    mainMatchList.matches.Add(match);
-            }
-
-            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
-
-            //
-            // Sending MatchList to Server for Statistic Purposes, disabled in the current Binary!!
-            // TODO enable
-            try
-            {
-                DataSender.StartClient();
-                DataSender.Send(mainMatchList);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
             }
         }
         #endregion
@@ -371,7 +335,7 @@ namespace CSharpBoiler
 
             DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(tempMatchData, steamID);
 
-            bool successfulAnalysis = await tempDemoAnalyzer.Analyze();
+            bool successfulAnalysis = await tempDemoAnalyzer.Analyse();
         }
 
         public MatchData GetMatchData(string demoURL)
@@ -406,14 +370,17 @@ namespace CSharpBoiler
             xmlWriter.Serialize(additionalDemoDataStreamWriter, additionalDemoData);
             additionalDemoDataStreamWriter.Close();
 
+            /*
             //DAT file Serialization
-            FileStream datFileStream = new FileStream(steamID + DATAENDING, FileMode.OpenOrCreate, FileAccess.Write);
+            FileStream datFileStream = new FileStream(steamID + MATCHLISTTAG + DATAENDING, FileMode.OpenOrCreate, FileAccess.Write);
             Serializer.Serialize<CMsgGCCStrike15_v2_MatchList>(datFileStream, mainMatchList);
             datFileStream.Close();
+            
 
             //Login Data Serialization
             if(StartCheckBoxesUserControlInstance.IsAutoLoginEnabled())
                 StartCheckBoxesUserControlInstance.StoreLogin();
+            */
 
             Application.Current.Shutdown(1);
         }
