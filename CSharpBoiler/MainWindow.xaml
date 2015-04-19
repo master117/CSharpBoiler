@@ -3,11 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:CSharpBoiler"
         xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
+        xmlns:converter="clr-namespace:CSharpBoiler.Converter"
         Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="925"
-        DataContext="{Binding matchDataList, RelativeSource={RelativeSource Self}}" Icon="Ico/Boiler.ico"
+         Icon="Ico/Boiler.ico"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
-        <m:IsLessThanConverter x:Key="IsLessThanConverter" />
+        <converter:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Won}" Value="False">
@@ -107,7 +108,10 @@
                 </DataGrid.Columns>
             </DataGrid>
             <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" />
-            <TextBlock Text="© Johannes Gocke, 2015" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  />
+            <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" />
+            <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
+            
+            <TextBlock Text="© Johannes Gocke, 2015 | Powered by Steam" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  />
         </StackPanel>
     </Grid>
 </Window>

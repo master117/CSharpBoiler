@@ -128,26 +128,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\IsLessThanConverter.cs" />
     <Compile Include="DemoAnalyzer.cs" />
-    <Compile Include="AdditionalDemoData.cs" />
-    <Compile Include="DemoModel\Buy.cs" />
-    <Compile Include="DemoModel\Demo.cs" />
-    <Compile Include="DemoModel\Item.cs" />
-    <Compile Include="DemoModel\KillEvent.cs" />
-    <Compile Include="DemoModel\Player.cs" />
-    <Compile Include="DemoModel\Round.cs" />
-    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\MatchComparer.cs" />
     <Compile Include="Helpers\TimeHelper.cs" />
-    <Compile Include="IsLessThanConverter.cs" />
-    <Compile Include="MatchData.cs" />
-    <Compile Include="NetworkHelper\UploadedDemoData.cs" />
     <Compile Include="NetworkHelper\MatchLinkSender.cs" />
+    <Compile Include="Models\AdditionalDemoData.cs" />
+    <Compile Include="Models\MatchData.cs" />
+    <Compile Include="Models\UploadedDemoData.cs" />
+    <Compile Include="NetworkHelper\VACStat_usSender.cs" />
     <Compile Include="StartBoiler.cs" />
-    <Compile Include="UIControls\PasswordBoxMonitor.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="UIControls\StartCheckBoxesUserControl.xaml.cs">
       <DependentUpon>StartCheckBoxesUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIControls\UploadedMatchLinksUserControl.xaml.cs">
+      <DependentUpon>UploadedMatchLinksUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIControls\VACStat_usUserControl.xaml.cs">
+      <DependentUpon>VACStat_usUserControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -162,6 +161,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UIControls\StartCheckBoxesUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIControls\UploadedMatchLinksUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIControls\VACStat_usUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

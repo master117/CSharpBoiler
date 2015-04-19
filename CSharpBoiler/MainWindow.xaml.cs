@@ -46,6 +46,7 @@ using System.Threading;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Xml.Serialization;
 using CSharpBoiler.Helpers;
+using CSharpBoiler.Models;
 using CSharpBoiler.NetworkHelper;
 
 namespace CSharpBoiler
@@ -63,15 +64,34 @@ namespace CSharpBoiler
         private const string MATCHLISTTAG = "_matchlist";
         private const string ADDITIONALDEMODATAFILE = "AdditionalDemoData.xml";
         //Object where we store the matchList, combbination of .dat file and CSGO retrieval
-        private CMsgGCCStrike15_v2_MatchList mainMatchList;
-        
+        private CMsgGCCStrike15_v2_MatchList mainMatchList;        
 
         #region Constructor
         public MainWindow(long tempSteamID)
         {
             InitializeComponent();
 
+            //Setting SteamID
             steamID = tempSteamID;
+
+            //Deserialize our stored data
+            DeserializeMatchData();
+            DeserializeAdditionalDemoData();
+
+            if (mainMatchList == null)
+                return;
+
+            //Parsing MatchData for UI
+            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
+
+            //Thread for Uploading MatchLinks to DB
+            ThreadStart uploadThreadStart = this.UploadMatchData;
+            Thread uploadThread = new Thread(uploadThreadStart);
+            uploadThread.Start();
+
+            //Initializing VACStat_us Control
+            VACStat_usSender.Initialize(mainMatchList, steamID);
+  
             MainGrid.DataContext = this;
             MouseDown += Window_MouseDown;
         }
@@ -90,25 +110,6 @@ namespace CSharpBoiler
             MainDataGrid.SelectionChanged += (obj, ev) =>
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             MainDataGrid.UnselectAll()));
-
-            //Deserialize our stored data
-            DeserializeMatchData();
-            DeserializeAdditionalDemoData();
-
-            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
-
-            //
-            // Sending MatchList to Server for Statistic Purposes
-            //
-            try
-            {
-                MatchLinkSender matchLinkSender = new MatchLinkSender(mainMatchList);
-                matchLinkSender.Send();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
         }
 
         private void DeserializeMatchData()
@@ -140,6 +141,29 @@ namespace CSharpBoiler
                 }
             }
         }
+        #endregion
+
+        #region MatchLinkUpload
+
+        public void UploadMatchData()
+        {
+            //
+            // Sending MatchList to Server for Statistic Purposes
+            //
+            try
+            {
+                MatchLinkSender matchLinkSender = new MatchLinkSender(mainMatchList);
+                int uploadedMatchLinks = matchLinkSender.Send();
+
+                Application.Current.Dispatcher.Invoke(
+                    new Action(() => { UploadedMatchLinksUserControlInstance.SetUploadedMatchLinksCount(uploadedMatchLinks, mainMatchList.matches.Count); }));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
         #endregion
 
         #region MatchData Parsing

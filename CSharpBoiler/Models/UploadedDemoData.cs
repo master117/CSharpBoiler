@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CSharpBoiler.NetworkHelper
+namespace CSharpBoiler.Models
 {
     public class UploadedDemoData : ISerializable
     {
@@ -14,6 +10,7 @@ namespace CSharpBoiler.NetworkHelper
         public string eventString { get; set; }
 
         public bool isSend { get; set; }
+        public bool isSendVACSTats { get; set; }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using SteamKit2.GC.CSGO.Internal;
 using System.IO;
+using CSharpBoiler.Models;
 
 namespace CSharpBoiler.NetworkHelper
 {
@@ -41,14 +42,20 @@ namespace CSharpBoiler.NetworkHelper
             }
         }
 
-        internal void Send()
+        //Uploads MatchLink to Server, return the Number of successfully uploaded MatchLinks
+        internal int Send()
         {
+            int uploadedMatchLinksCounter = 0;
+
             using (WebClient client = new WebClient())
             {
                 foreach (var demoData in uploadedDemoDataList)
                 {
                     if (demoData.isSend)
+                    {
+                        uploadedMatchLinksCounter++;
                         continue;
+                    }
 
                     try
                     {
@@ -64,6 +71,7 @@ namespace CSharpBoiler.NetworkHelper
                         Console.WriteLine(result);
 
                         demoData.isSend = true;
+                        uploadedMatchLinksCounter++;
                     }
                     catch (WebException e)
                     {
@@ -77,6 +85,8 @@ namespace CSharpBoiler.NetworkHelper
             }
 
             SerializeDemoData();
+
+            return uploadedMatchLinksCounter;
         }
 
         private void DeSerializeDemoData()
