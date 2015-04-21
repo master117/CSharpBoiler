@@ -63,8 +63,9 @@ namespace CSharpBoiler
         private const string DATAENDING = ".dat";
         private const string MATCHLISTTAG = "_matchlist";
         private const string ADDITIONALDEMODATAFILE = "AdditionalDemoData.xml";
-        //Object where we store the matchList, combbination of .dat file and CSGO retrieval
-        private CMsgGCCStrike15_v2_MatchList mainMatchList;        
+        //Object where we store the matchList
+        private CMsgGCCStrike15_v2_MatchList mainMatchList;
+        private const long VOLVOMAGICNUMBER = 76561197960265728;
 
         #region Constructor
         public MainWindow(long tempSteamID)
@@ -90,7 +91,13 @@ namespace CSharpBoiler
             uploadThread.Start();
 
             //Initializing VACStat_us Control
-            VACStat_usSender.Initialize(mainMatchList, steamID);
+            HashSet<string> steamIdsHashSet = new HashSet<string>();
+
+            foreach (var cDataGccStrike15V2MatchInfo in mainMatchList.matches)
+                foreach (var accountId in cDataGccStrike15V2MatchInfo.roundstats.reservation.account_ids)
+                    steamIdsHashSet.Add((accountId + VOLVOMAGICNUMBER).ToString());
+
+            VACStat_usSender.Initialize(steamIdsHashSet);
   
             MainGrid.DataContext = this;
             MouseDown += Window_MouseDown;
@@ -287,7 +294,8 @@ namespace CSharpBoiler
             }
             else
             {
-                MessageBox.Show("Demo is already Downloaded");
+                File.Delete(DEMOFOLDER + tempDemoFileName);
+                MessageBox.Show("Demo was already Downloaded, deleted Demo");
             }
         }
 
@@ -306,7 +314,16 @@ namespace CSharpBoiler
         {
             await Task.Run(() =>
             {
+                if (e.Error != null)
+                {
+                    MessageBox.Show("Demo is too old, Download no Longer Available");
+                    return;
+                }
+
                 UnZipDemo(tempDemoFileName);
+
+                if (Directory.Exists(DEMOFOLDER) && File.Exists(DEMOFOLDER + tempDemoFileName))
+                    File.Delete(DEMOFOLDER + tempDemoFileName);
 
                 UpdateDownloadedList();
             }).ConfigureAwait(continueOnCapturedContext: false);
@@ -323,7 +340,7 @@ namespace CSharpBoiler
                     FileStream outputStream = File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
                     BZip2.Decompress(inputStream, outputStream, true);
                     inputStream.Close();
-                    outputStream.Close();
+                    outputStream.Close();                   
                 }
             }
         }
@@ -439,6 +456,15 @@ namespace CSharpBoiler
                 }
             }
         }
+        #endregion
+
+        #region Events
+
+        private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SettingGrid.Visibility = SettingGrid.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
+        }
+
         #endregion
     }
 }

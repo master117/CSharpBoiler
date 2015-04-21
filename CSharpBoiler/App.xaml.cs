@@ -34,23 +34,25 @@ namespace CSharpBoiler
     {
         public App()
         {
-            int steamID = StartBoiler.StartAndGetSteamID();
+            //int steamId = StartBoiler.StartAndGetSteamID();
 
-            if (steamID == 0)
+            int steamId = 33990548;
+
+            if (steamId == 0)
             {
                 MessageBox.Show("Steam must be running for CSharpBoiler to work.\n Open Steam and close this MessageBox afterwards.");
-                steamID = StartBoiler.StartAndGetSteamID();
+                steamId = StartBoiler.StartAndGetSteamID();
             }
 
-            if (steamID == 0)
+            if (steamId == 0)
             {
                 MessageBox.Show("Still no running SteamClient found. Closing.");
                 Environment.Exit(1);
             }
 
-            if (steamID != 0)
+            if (steamId != 0)
             {
-                var mainWindow = new MainWindow(steamID);
+                var mainWindow = new MainWindow(steamId);
                 mainWindow.Closed += MainWindow_Closed;
                 mainWindow.Show();
             }

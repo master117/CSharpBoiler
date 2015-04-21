@@ -4,114 +4,168 @@
         xmlns:m="clr-namespace:CSharpBoiler"
         xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
         xmlns:converter="clr-namespace:CSharpBoiler.Converter"
-        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing" Width="925"
-         Icon="Ico/Boiler.ico"
+        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing"
+        Icon="Ico/Boiler.ico"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
         <converter:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
             <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                </Trigger>
                 <DataTrigger Binding="{Binding Won}" Value="False">
-                    <Setter Property="Background" Value="#FFFFB3B3" />
+                    <Setter Property="Foreground" Value="#FFFFB3B3" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Won}" Value="True">
-                    <Setter Property="Background" Value="#FFAFFFAF" />
+                    <Setter Property="Foreground" Value="#FFAFFFAF" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
-        <Style x:Key="DownloadButtonStyle" TargetType="Button">
+
+        <Style x:Key="ResultImage" TargetType="Image">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Downloaded}" Value="False">
-                    <Setter Property="Background" Value="Transparent" />
+                <DataTrigger Binding="{Binding Won}" Value="False">
+                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Lose.png" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Won}" Value="True">
+                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Win.png" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DownloadButtonImageStyle" TargetType="Image">
+            <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-OFF.png" />
+            <Style.Triggers>
                 <DataTrigger Binding="{Binding Downloaded}" Value="True">
-                    <Setter Property="Background" Value="LightGreen" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        
-        <Style x:Key="AnalyzeButtonStyle" TargetType="Button">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding AnalysisProgress,
-                    Converter={StaticResource IsLessThanConverter},
-                    ConverterParameter=100}" Value="True">
-                    <Setter Property="Background" Value="Transparent" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding AnalysisProgress}" Value="100">
-                    <Setter Property="Background" Value="LightGreen" />
+                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-On.png" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid Name="MainGrid">
+    <Grid Name="MainGrid" Background="#000000">
         <Grid.Resources>
             <!--DataTemplates for DemoSection -->
             <DataTemplate x:Key="DemoTemplate" >
-                <Grid>
-                    <ProgressBar x:Name="DemoDownloadButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" />
-                    <Button x:Name="DemoDownloadButton" Content="Download Demo" Tag="{Binding Demo}" Style="{StaticResource DownloadButtonStyle}" Width="100" Click="DemoDownloadButton_Click" />                   
-                </Grid>
-            </DataTemplate>
-            <DataTemplate x:Key="AnalyzeTemplate" >
-                <Grid>
-                    <ProgressBar x:Name="DemoAnalyzeButtonProgressbar" Maximum="100" Minimum="0" Value="{Binding AnalysisProgress, UpdateSourceTrigger=PropertyChanged}" Width="100" />
-                    <Button x:Name="DemoAnalyzeButton" Content="Analyse" Tag="{Binding Demo}" Style="{StaticResource AnalyzeButtonStyle}" Width="100" Click="DemoAnalyzeButton_Click" />
+                <Grid Background="Transparent">
+                    <ProgressBar x:Name="DemoDownloadButtonProgressbar" RenderTransformOrigin="0.5,0.5" Foreground="#AAAFFFAF" FlowDirection="RightToLeft" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32">
+                        <ProgressBar.RenderTransform>
+                            <RotateTransform Angle="-90" />
+                        </ProgressBar.RenderTransform>
+                    </ProgressBar>
+                    <Button x:Name="DemoDownloadButton" Tag="{Binding Demo}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="DemoDownloadButton_Click">
+                        <Image Style="{StaticResource DownloadButtonImageStyle}"></Image>
+                    </Button>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="DemoCommentTemplate" >
-                <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
+                <TextBox x:Name="DemoCommentTextBox" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" FontFamily="Century Gothic" FontWeight="DemiBold" Opacity="0.3"></TextBox>
             </DataTemplate>
         </Grid.Resources>
 
-        <StackPanel Background="Black">
-            <DockPanel Margin="5" >
+        <StackPanel Background="Transparent">
+            <DockPanel Margin="2" Height="48" VerticalAlignment="Top">
                 <Image Source="Images/BoilerStyl2P4_48x48.png" Height="48" Width="48" HorizontalAlignment="Left" Margin="-5" />
                 <TextBlock Text="CSharpBoiler" FontSize="26" Background="Transparent" VerticalAlignment="Center" FontFamily="Century Gothic" Foreground="White" />
-                <Button Name="CloseButton" Click="CloseButton_Click" Content="x" 
-                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-10,0,0"
-                Background="Transparent" BorderBrush="Transparent" BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
-                FontWeight="Bold" Foreground="White" FontFamily="Century Gothic" FontSize="32" Width="32" Height="38" />
+                <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" Margin="0,-5,0,0" >
+                    <Button Name="SettingsButton" Click="SettingsButton_OnClick" VerticalAlignment="Center" VerticalContentAlignment="Center" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Margin="0,0,0,0" Height="31" Width="31" >
+                        <Image Source="Images/CSharpBoilerUI_Settings.png" />
+                    </Button>
+                    <Button Name="CloseButton" Click="CloseButton_Click" Content="x" Margin="0,-12,0,0"
+                        Background="Transparent" BorderBrush="Transparent" BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                        FontWeight="Bold" Foreground="White" FontFamily="Century Gothic" FontSize="46" Width="32" Height="55" />
+                </DockPanel>
             </DockPanel>
 
-            <DataGrid
+            <Grid>
+                <Grid.Background>
+                    <ImageBrush ImageSource="Images/CSharpBoilerUI_Background.png" Stretch="Fill" />
+                </Grid.Background>
+                <Rectangle Fill="#202225" Height="35" VerticalAlignment="Top"/>
+                <DataGrid
             PresentationTraceSources.TraceLevel="High"
             AutoGenerateColumns="False"
             HorizontalAlignment="Stretch" 
             Name="MainDataGrid"
             VerticalScrollBarVisibility="Auto"
-            MaxHeight="600"
+            MaxHeight="610"
             VerticalAlignment="Top"
             CanUserAddRows="False"
-            RowHeaderWidth="0">
+            RowHeaderWidth="0" Padding="0,0" GridLinesVisibility="None"
+            BorderBrush="Transparent" BorderThickness="0" Margin="5,0" Background="Transparent">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#202225" />
+                            <Setter Property="Foreground" Value="WhiteSmoke" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="Height" Value="35" />
+                            <Setter Property="MinWidth" Value="100" />
+                            <Setter Property="FontSize" Value="26" />
+                            <Setter Property="SeparatorVisibility" Value="Visible" />
+                            <Setter Property="SeparatorBrush" Value="WhiteSmoke" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
 
-                <DataGrid.Columns >
-                    <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}"  />
-                    <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}"  />
-                    <DataGridTextColumn Header="Kills" IsReadOnly="True" Binding="{Binding Kills}"  />
-                    <DataGridTextColumn Header="Assists" IsReadOnly="True" Binding="{Binding Assists}"  />
-                    <DataGridTextColumn Header="Deaths" IsReadOnly="True" Binding="{Binding Deaths}"  />
-                    <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}"  />
-                    <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}"  />
-                    <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="#AA393c3e" />
+                            <Setter Property="Margin" Value="0,5" />
+                            <Setter Property="FontSize" Value="18" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#73777d"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
 
-                    <DataGridTemplateColumn Header="Demo" CellTemplate="{StaticResource DemoTemplate}" />
-                    <DataGridTemplateColumn Header="Analyse" CellTemplate="{StaticResource AnalyzeTemplate}" />
-                    <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
+                    <DataGrid.Columns >
+                        <DataGridTemplateColumn Header="" Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Height="32" Width="32" Style="{StaticResource ResultImage}">
 
-                    <DataGridTextColumn Header="3Ks" IsReadOnly="True" Binding="{Binding K3}"  />
-                    <DataGridTextColumn Header="4Ks" IsReadOnly="True" Binding="{Binding K4}"  />
-                    <DataGridTextColumn Header="5Ks" IsReadOnly="True" Binding="{Binding K5}"  />
-                    <DataGridTextColumn Header="HS%" IsReadOnly="True" Binding="{Binding HS}"  />
-                </DataGrid.Columns>
-            </DataGrid>
-            <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" />
-            <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" />
-            <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
-            
-            <TextBlock Text="© Johannes Gocke, 2015 | Powered by Steam" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  />
+                                    </Image>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}"  />
+                        <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}"  />
+                        <DataGridTextColumn Header="Kills" IsReadOnly="True" Binding="{Binding Kills}"  />
+                        <DataGridTextColumn Header="Assists" IsReadOnly="True" Binding="{Binding Assists}"  />
+                        <DataGridTextColumn Header="Deaths" IsReadOnly="True" Binding="{Binding Deaths}"  />
+                        <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}"  />
+                        <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}"  />
+                        <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
+
+                        <DataGridTemplateColumn Header="Demo" CellTemplate="{StaticResource DemoTemplate}" />
+                        <DataGridTemplateColumn Header="Demo Comment" CellTemplate="{StaticResource DemoCommentTemplate}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+            <DockPanel>
+                <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
+                <TextBlock Text="© Johannes Gocke, 2015 | Powered by Steam" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" Margin="0,0,10,0"  />
+            </DockPanel>
         </StackPanel>
+
+        <Grid Name="SettingGrid" Visibility="Hidden" Background="#303030" Margin="0,40,36,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <Border BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+                <StackPanel Background="Transparent" >
+                    <Rectangle Fill="#303030" Height="10" HorizontalAlignment="Right" Margin="0,-7,4,0" Width="10" UseLayoutRounding="False"  >
+                        <Rectangle.RenderTransform>
+                            <RotateTransform Angle="45" />
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                    <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="0,0,10,0" />
+                    <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="0,0,10,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

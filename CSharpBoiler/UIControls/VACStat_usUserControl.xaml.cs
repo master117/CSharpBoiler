@@ -22,9 +22,6 @@ namespace CSharpBoiler.UIControls
     /// </summary>
     public partial class VACStat_usUserControl : UserControl
     {
-        private bool wasChecked = false;
-        private List<string> UserLists; 
-
         public VACStat_usUserControl()
         {
             InitializeComponent();
@@ -32,8 +29,6 @@ namespace CSharpBoiler.UIControls
             if (Properties.Settings.Default.VACStat_usKey != "")
             {
                 VacStat_usCheckBox.IsChecked = true;
-                wasChecked = true;
-                VAC_Stats_usAPIKEYTextBox.Text = Properties.Settings.Default.VACStat_usKey;
             }
         }
 
@@ -44,20 +39,46 @@ namespace CSharpBoiler.UIControls
 
         private void VacStat_usCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (wasChecked && !IsChecked())
-                Properties.Settings.Default.VACStat_usKey = "";
+            ApikeyDockPanel.Visibility = Visibility.Visible;
+        }
 
-            if (IsChecked())
+        private void VacStat_usCheckBox_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            ApikeyDockPanel.Visibility = Visibility.Collapsed;
+            ListsDockPanel.Visibility = Visibility.Collapsed;
+            Properties.Settings.Default.VACStat_usKey = "";
+        }
+
+        private void GetListsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.VACStat_usKey = VAC_Stats_usAPIKEYTextBox.Text;
+            VAC_Stats_usListComboBox.ItemsSource = VACStat_usSender.GetLists(VAC_Stats_usAPIKEYTextBox.Text);
+            VAC_Stats_usListComboBox.SelectedIndex = 0;
+
+            ApikeyDockPanel.Visibility = Visibility.Collapsed;
+            ListsDockPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ChooseListButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            int selectedIndex = VAC_Stats_usListComboBox.SelectedIndex;
+            Dictionary<int, string> listDictionary = (Dictionary<int, string>) VAC_Stats_usListComboBox.ItemsSource;
+
+            if (selectedIndex >= 0 && selectedIndex < listDictionary.Count)
             {
-                if (VAC_Stats_usAPIKEYTextBox.Text == "")
-                {
-                    MessageBox.Show("Please enter a Valid API KEY");
-                    VacStat_usCheckBox.IsChecked = false;
-                    return;
-                }
+                ListsDockPanel.Visibility = Visibility.Collapsed;
 
-                VACStat_usSender.GetLists(VAC_Stats_usAPIKEYTextBox.Text);
+                VACStat_usSender.Send(Properties.Settings.Default.VACStat_usKey, listDictionary.ElementAt(selectedIndex).Key);
             }
+        }
+
+        private void ExplanationButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("You can now automatically add users from this program to your VacStatus list! " +
+                            "Inorder to allow this program to add users for you, " +
+                            "go on profile settings page on vacstatus (https://vacstat.us/settings) " +
+                            "and paste the private key to the textbox on this program. " +
+                            "And after you have done that, select the list that you want the users inserted.");
         }
     }
 }
