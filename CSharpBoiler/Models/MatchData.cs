@@ -16,13 +16,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System;
 using System.ComponentModel;
 
 namespace CSharpBoiler.Models
 {
     public class MatchData : INotifyPropertyChanged
     {
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public string Result { get; set; }
         public bool Won { get; set; }
         public int Kills { get; set; }
@@ -52,7 +53,27 @@ namespace CSharpBoiler.Models
                 OnPropertyChanged(new PropertyChangedEventArgs("DownloadProgress"));
             }
         }
-        public string DemoComment { get; set; }
+        public string _DemoComment { get; set; }
+        public string DemoComment
+        {
+            get { return _DemoComment; }
+            set
+            {
+                _DemoComment = value;
+                Commented = value != "";
+            }
+
+        }
+        public bool _Commented { get; set; }
+        public bool Commented
+        {
+            get { return _Commented; }
+            set
+            {
+                _Commented = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("Commented"));
+            }
+        }
         public int _K3 { get; set; }
         public int K3
         {

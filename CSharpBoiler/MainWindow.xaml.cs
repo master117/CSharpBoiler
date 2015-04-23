@@ -189,7 +189,7 @@ namespace CSharpBoiler
                     //Creating new MatchData
                     MatchData matchData = new MatchData();
                     //Date
-                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToString("yyyy-MM-dd hh:mm");
+                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToLocalTime(); //.ToString("yyyy-MM-dd hh:mm");
                     //Finding the Position of our own entries
                     int j = 0;
                     for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
@@ -430,10 +430,8 @@ namespace CSharpBoiler
         {
             foreach (MatchData tempMatchData in matchDataList)
             {
-                if (tempMatchData.DemoComment != null && tempMatchData.DemoComment != "")
-                {
-                    additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
-                }
+
+                additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
 
                 if (tempMatchData.K3 != 0)
                 {
@@ -465,6 +463,39 @@ namespace CSharpBoiler
             SettingGrid.Visibility = SettingGrid.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
         }
 
+
+        private void ShowComment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Get the Selected Row Button
+                Button button = (Button)sender;
+
+                // Check if the Button is null  
+                if (button != null)
+                {
+                    // Return the row which contains the specified button
+                    DataGridRow dataGridRowSelectedRow = DataGridRow.GetRowContainingElement(button);
+
+                    // Check if the DataGridRow is null  
+                    if (dataGridRowSelectedRow != null)
+                    {
+                        // if Collapsed -> Visible 
+                        if (dataGridRowSelectedRow.DetailsVisibility == System.Windows.Visibility.Collapsed)
+                            dataGridRowSelectedRow.DetailsVisibility = System.Windows.Visibility.Visible;
+                        // else collaps row Details  
+                        else
+                            dataGridRowSelectedRow.DetailsVisibility = System.Windows.Visibility.Collapsed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         #endregion
+
     }
 }

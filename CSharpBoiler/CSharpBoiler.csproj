@@ -226,11 +226,20 @@
     <Resource Include="Images\CSharpBoilerUI_Background.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\CSharpBoilerUI_Download-OFF.png" />
     <Resource Include="Images\CSharpBoilerUI_Download-ON.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\CSharpBoilerUI_Settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CSharpBoilerUI_Comments-OFF.png" />
+    <Resource Include="Images\CSharpBoilerUI_Comments-ON.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CSharpBoilerUI_Download-Stencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CSharpBoilerUI_Download-OFF.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

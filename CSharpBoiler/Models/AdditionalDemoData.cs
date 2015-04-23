@@ -30,13 +30,14 @@ namespace CSharpBoiler.Models
         public SerializableDictionary<string, int> K5Dictionary = new SerializableDictionary<string, int>();
         public SerializableDictionary<string, int> HSDictionary = new SerializableDictionary<string, int>();
 
-        #region generated Getter Setter
+        #region Generated Getter Setter
         public void AddComment(string key, string value)
         {
             if (DemoCommentDictionary.ContainsKey(key))
                 DemoCommentDictionary.Remove(key);
 
-            DemoCommentDictionary.Add(key, value);
+            if(!string.IsNullOrEmpty(value))
+                DemoCommentDictionary.Add(key, value);
         }
 
         public bool ContainsComment(string key)

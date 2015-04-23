@@ -21,9 +21,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace CSharpBoiler
 {
@@ -34,6 +36,9 @@ namespace CSharpBoiler
     {
         public App()
         {
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement), new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+
             //int steamId = StartBoiler.StartAndGetSteamID();
 
             int steamId = 33990548;
