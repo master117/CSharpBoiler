@@ -362,23 +362,6 @@ namespace CSharpBoiler
 
         #region DemoAnalyze
 
-        private async void DemoAnalyzeButton_Click(object sender, RoutedEventArgs e)
-        {
-            string url = ((Button)sender).Tag.ToString();
-
-            MatchData tempMatchData = GetMatchData(url);
-
-            if (!tempMatchData.Downloaded)
-            {
-                MessageBox.Show("Demo is not (fully) Downloaded or Unzipped, please wait a second or Start the Download if you didn't already do so.");
-                return;
-            }
-
-            DemoAnalyzer tempDemoAnalyzer = new DemoAnalyzer(tempMatchData, steamID);
-
-            bool successfulAnalysis = await tempDemoAnalyzer.Analyse();
-        }
-
         public MatchData GetMatchData(string demoURL)
         {
             return matchDataList.SingleOrDefault(i => i.Demo == demoURL);

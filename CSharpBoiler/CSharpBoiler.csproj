@@ -77,10 +77,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DemoInfo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dc7de83c756ec63d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\demoinfo-public\DemoInfo\bin\Release\DemoInfo.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\ICSharpCode.SharpZipLib.Patched.0.86.4\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -134,7 +130,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\IsLessThanConverter.cs" />
-    <Compile Include="DemoAnalyzer.cs" />
     <Compile Include="Helpers\MatchComparer.cs" />
     <Compile Include="Helpers\TimeHelper.cs" />
     <Compile Include="NetworkHelper\MatchLinkSender.cs" />

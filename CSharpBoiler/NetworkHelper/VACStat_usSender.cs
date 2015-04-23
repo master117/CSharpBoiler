@@ -7,7 +7,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpBoiler.Models;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SteamKit2.GC.CSGO.Internal;
 
