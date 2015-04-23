@@ -6,7 +6,7 @@
         xmlns:converter="clr-namespace:CSharpBoiler.Converter"
         Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing"
         Icon="Ico/Boiler.ico" Height="670" Width="820"
-        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" SizeChanged="MainWindow_OnSizeChanged">
     <Window.Resources>
         <converter:IsLessThanConverter x:Key="IsLessThanConverter" />
         <Style TargetType="{x:Type DataGridCell}">
@@ -75,7 +75,7 @@
                 <DataGrid Name="MainDataGrid"
                     PresentationTraceSources.TraceLevel="High" AutoGenerateColumns="False"
                     HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto"
-                    MaxHeight="610"
+                          Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=RenderSize.ActualHeight}"                    
                     VerticalAlignment="Top" CanUserAddRows="False" RowHeaderWidth="0" GridLinesVisibility="None"
                     BorderBrush="Transparent" BorderThickness="0" Margin="5,0" Background="Transparent">
                     <DataGrid.ColumnHeaderStyle>
@@ -110,7 +110,7 @@
                             </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
-
+                                        
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="" Width="50">
                             <DataGridTemplateColumn.CellTemplate>
@@ -142,12 +142,25 @@
                                     </Grid>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="BorderBrush" Value="#44999999" />
+                                    <Setter Property="BorderThickness" Value="0,0,0,0" />
+                                    <Setter Property="Padding" Value="10,0,10,0" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="Background" Value="#202225" />
+                                    <Setter Property="Foreground" Value="WhiteSmoke" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Height" Value="35" />
+                                    <Setter Property="FontSize" Value="26" />
+                                </Style>
+                            </DataGridTemplateColumn.HeaderStyle>
                         </DataGridTemplateColumn>
                         <DataGridTemplateColumn>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button x:Name="ShowComment" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="ShowComment_OnClick">
-                                        <Image Style="{StaticResource ShowCommentButtonImageStyle}"></Image>
+                                        <Image Style="{StaticResource ShowCommentButtonImageStyle}" />
                                     </Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -176,9 +189,10 @@
                             </Grid>
                         </DataTemplate>
                     </DataGrid.RowDetailsTemplate>
+                    
                 </DataGrid>
             </Grid>
-            <DockPanel Height="20">
+            <DockPanel Name="FooterDockPanel" Height="20">
                 <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
                 <TextBlock Text="© Johannes Gocke, 2015 | Powered by Steam" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" Margin="0,0,10,0"  />
             </DockPanel>

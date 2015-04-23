@@ -446,7 +446,6 @@ namespace CSharpBoiler
             SettingGrid.Visibility = SettingGrid.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
         }
 
-
         private void ShowComment_OnClick(object sender, RoutedEventArgs e)
         {
             try
@@ -478,7 +477,12 @@ namespace CSharpBoiler
             }
         }
 
-        #endregion
+        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //If we Resize our WIndow the Table needs to get automatically Resized too
+            MainDataGrid.MaxHeight = e.NewSize.Height - HeaderDockPanel.Height - FooterDockPanel.Height - 10;
+        }
 
+        #endregion
     }
 }
