@@ -236,6 +236,10 @@
   <ItemGroup>
     <Resource Include="Images\CSharpBoilerUI_Download-OFF.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\CSharpBoilerUI_Download-OFF_32x32.png" />
+    <Resource Include="Images\CSharpBoilerUI_Download-ON_32x32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

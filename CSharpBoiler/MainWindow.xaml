@@ -4,17 +4,24 @@
         xmlns:m="clr-namespace:CSharpBoiler"
         xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
         xmlns:converter="clr-namespace:CSharpBoiler.Converter"
-        Title="CSharpBoiler" Loaded="Window_Loaded" Closing="Window_Closing"
-        Icon="Ico/Boiler.ico" Height="670" Width="820"
-        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" SizeChanged="MainWindow_OnSizeChanged">
+        Title="CSharpBoiler © Johannes Gocke, 2015 | Powered by Steam" Loaded="Window_Loaded" Closing="Window_Closing"
+        Icon="Ico/Boiler.ico" Height="670" Width="820">
     <Window.Resources>
         <converter:IsLessThanConverter x:Key="IsLessThanConverter" />
-        <Style TargetType="{x:Type DataGridCell}">
-            <Setter Property="Margin" Value="5,0" />
+        <Style TargetType="{x:Type DataGridCell}">        
             <Setter Property="TextBlock.TextAlignment" Value="Center" />
-            <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Won}" Value="False">
                     <Setter Property="Foreground" Value="#FFFFB3B3" />
@@ -22,6 +29,23 @@
                 <DataTrigger Binding="{Binding Won}" Value="True">
                     <Setter Property="Foreground" Value="#FFAFFFAF" />
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NoHoverButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Green"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Red"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -35,16 +59,14 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
         <Style x:Key="DownloadButtonImageStyle" TargetType="Image">
-            <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-OFF.png" />
+            <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-OFF_32x32.png" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Downloaded}" Value="True">
-                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-ON.png" />
+                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-ON_32x32.png" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
         <Style x:Key="ShowCommentButtonImageStyle" TargetType="Image">
             <Setter Property="Source" Value="Images/CSharpBoilerUI_Comments-OFF.png" />
             <Style.Triggers>
@@ -53,163 +75,126 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="SeperatorHeaderStyle" TargetType="DataGridColumnHeader" >
+            <Setter Property="BorderBrush" Value="#44999999" />
+            <Setter Property="BorderThickness" Value="0,0,2,0" />
+            <Setter Property="Padding" Value="10,0,10,0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="#202225" />
+            <Setter Property="Foreground" Value="WhiteSmoke" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="FontSize" Value="26" />
+        </Style>
     </Window.Resources>
 
-    <Grid Name="MainGrid" Background="#000000">
-        <StackPanel Background="Transparent">
-           
-            <DockPanel Name="HeaderDockPanel" Margin="2" Height="30" VerticalAlignment="Top">
-                <Image Source="Images/BoilerStyl2P4_48x48.png" Height="30" Width="30" HorizontalAlignment="Left" Margin="-5" />
-                <TextBlock Text="CSharpBoiler" FontSize="26" Background="Transparent" VerticalAlignment="Center" FontFamily="Century Gothic" Foreground="White" />
-                <DockPanel HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" Margin="0,0,0,0" >
-                    <Button Name="SettingsButton" Click="SettingsButton_OnClick" VerticalAlignment="Center" VerticalContentAlignment="Center" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Margin="0,0,0,0" Height="31" Width="31" >
-                        <Image Source="Images/CSharpBoilerUI_Settings.png" />
-                    </Button>
-                    <Button Name="CloseButton" Click="CloseButton_Click" Content="x" Margin="0,-19,0,0"
-                        Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontWeight="Bold" Foreground="White" FontFamily="Century Gothic" FontSize="46" Width="32" Height="55" />
-                </DockPanel>
-            </DockPanel>
-
-            <Grid Background="#657384">
-                <Rectangle Fill="#202225" Height="35" VerticalAlignment="Top"/>
-                <DataGrid Name="MainDataGrid"
-                    PresentationTraceSources.TraceLevel="High" AutoGenerateColumns="False"
-                    HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto"
-                          Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=RenderSize.ActualHeight}"                    
-                    VerticalAlignment="Top" CanUserAddRows="False" RowHeaderWidth="0" GridLinesVisibility="None"
+    <Grid Name="MainGrid" Background="#657384">
+        <Rectangle Fill="#202225" Height="35" VerticalAlignment="Top"/>
+        <DataGrid Name="MainDataGrid" AutoGenerateColumns="False" VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Visible"                   
+                    CanUserAddRows="False" RowHeaderWidth="0" GridLinesVisibility="None"
                     BorderBrush="Transparent" BorderThickness="0" Margin="5,0" Background="Transparent">
-                    <DataGrid.ColumnHeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="BorderBrush" Value="#44999999" />
-                            <Setter Property="BorderThickness" Value="0,0,2,0" />
-                            <Setter Property="Padding" Value="10,0,10,0" />
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
-                            <Setter Property="Background" Value="#202225" />
-                            <Setter Property="Foreground" Value="WhiteSmoke" />
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="Height" Value="35" />
-                            <Setter Property="FontSize" Value="26" />
-                        </Style>
-                    </DataGrid.ColumnHeaderStyle>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="BorderBrush" Value="#44999999" />
+                    <Setter Property="BorderThickness" Value="0,0,0,0" />
+                    <Setter Property="Padding" Value="10,0,10,0" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="Background" Value="#202225" />
+                    <Setter Property="Foreground" Value="WhiteSmoke" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="Height" Value="35" />
+                    <Setter Property="FontSize" Value="26" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
 
-                    <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow">
-                            <Setter Property="Background" Value="#AA393c3e" />
-                            <Setter Property="Margin" Value="0,5" />
-                            <Setter Property="FontSize" Value="18" />
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="DetailsVisibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#73777d"/>
-                                </Trigger>
-                                <DataTrigger Binding="{Binding Commented}" Value="True">
-                                    <Setter Property="DetailsVisibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.RowStyle>
-                                        
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="" Width="50">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Height="32" Width="32" Style="{StaticResource ResultImage}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}" />
-                        <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}"  />
-                        <DataGridTextColumn Header="K" IsReadOnly="True" Binding="{Binding Kills}"  />
-                        <DataGridTextColumn Header="A" IsReadOnly="True" Binding="{Binding Assists}"  />
-                        <DataGridTextColumn Header="D" IsReadOnly="True" Binding="{Binding Deaths}"  />
-                        <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}"  />
-                        <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}"  />
-                        <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}"  />
-                        <DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Grid Background="Transparent">
-                                        <ProgressBar x:Name="DemoDownloadButtonProgressbar" RenderTransformOrigin="0.5,0.5" Foreground="#AAAFFFAF" FlowDirection="RightToLeft" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32">
-                                            <ProgressBar.RenderTransform>
-                                                <RotateTransform Angle="-90" />
-                                            </ProgressBar.RenderTransform>
-                                        </ProgressBar>                                   
-                                        <Button x:Name="DemoDownloadButton" Tag="{Binding Demo}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="DemoDownloadButton_Click">
-                                            <Image Style="{StaticResource DownloadButtonImageStyle}" />
-                                        </Button>                                      
-                                    </Grid>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.HeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="BorderBrush" Value="#44999999" />
-                                    <Setter Property="BorderThickness" Value="0,0,0,0" />
-                                    <Setter Property="Padding" Value="10,0,10,0" />
-                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                    <Setter Property="Background" Value="#202225" />
-                                    <Setter Property="Foreground" Value="WhiteSmoke" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="Height" Value="35" />
-                                    <Setter Property="FontSize" Value="26" />
-                                </Style>
-                            </DataGridTemplateColumn.HeaderStyle>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button x:Name="ShowComment" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="ShowComment_OnClick">
-                                        <Image Style="{StaticResource ShowCommentButtonImageStyle}" />
-                                    </Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.HeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="BorderBrush" Value="#44999999" />
-                                    <Setter Property="BorderThickness" Value="0,0,0,0" />
-                                    <Setter Property="Padding" Value="10,0,10,0" />
-                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                    <Setter Property="Background" Value="#202225" />
-                                    <Setter Property="Foreground" Value="WhiteSmoke" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="Height" Value="35" />
-                                    <Setter Property="FontSize" Value="26" />
-                                </Style>
-                            </DataGridTemplateColumn.HeaderStyle>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#AA393c3e" />
+                    <Setter Property="Margin" Value="0,5" />
+                    <Setter Property="FontSize" Value="18" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="DetailsVisibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#73777d"/>
+                        </Trigger>
+                        <DataTrigger Binding="{Binding Commented}" Value="True">
+                            <Setter Property="DetailsVisibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
 
-                    <DataGrid.RowDetailsTemplate>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" Width="50">
+                    <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid Background="#657384">
-                                <Grid Background="#AAb4b7bb" Margin="10,0,10,0" >
-                                    <TextBox x:Name="DemoCommentTextBox" Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="22" Height="66" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Century Gothic" FontWeight="DemiBold" Opacity="0.3"></TextBox>
-                                </Grid>
+                            <Image Height="32" Width="32" Style="{StaticResource ResultImage}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Date" IsReadOnly="True" Binding="{Binding Date}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="Result" IsReadOnly="True" Binding="{Binding Result}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="K" IsReadOnly="True" Binding="{Binding Kills}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="A" IsReadOnly="True" Binding="{Binding Assists}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="D" IsReadOnly="True" Binding="{Binding Deaths}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="MVPs" IsReadOnly="True" Binding="{Binding MVPs}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="Score" IsReadOnly="True" Binding="{Binding Score}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTextColumn Header="K/D" IsReadOnly="True" Binding="{Binding KD}" HeaderStyle="{StaticResource SeperatorHeaderStyle}" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Background="Transparent" Margin="5,0">
+                                <ProgressBar x:Name="DemoDownloadButtonProgressbar" RenderTransformOrigin="0.5,0.5" Foreground="#AAAFFFAF" FlowDirection="RightToLeft" Maximum="100" Minimum="0" Value="{Binding DownloadProgress, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Margin="0,-3,0,0" Width="26" Height="24">
+                                    <ProgressBar.RenderTransform>
+                                        <RotateTransform Angle="-90" />
+                                    </ProgressBar.RenderTransform>
+                                </ProgressBar>
+                                <Button x:Name="DemoDownloadButton" Style="{StaticResource NoHoverButtonStyle}" Tag="{Binding Demo}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Click="DemoDownloadButton_Click">
+                                    <Image Style="{StaticResource DownloadButtonImageStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="32" Height="32" Stretch="Fill" />
+                                </Button>
                             </Grid>
                         </DataTemplate>
-                    </DataGrid.RowDetailsTemplate>
-                    
-                </DataGrid>
-            </Grid>
-            <DockPanel Name="FooterDockPanel" Height="20">
-                <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
-                <TextBlock Text="© Johannes Gocke, 2015 | Powered by Steam" Foreground="White" FontSize="14" FontFamily="Century Gothic" HorizontalAlignment="Right" Margin="0,0,10,0"  />
-            </DockPanel>
-        </StackPanel>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Margin="5,0" x:Name="ShowComment" Style="{StaticResource NoHoverButtonStyle}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="ShowComment_OnClick">
+                                <Image Style="{StaticResource ShowCommentButtonImageStyle}" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
 
-        <Grid Name="SettingGrid" Visibility="Hidden" Background="#303030" Margin="0,40,36,0" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <Border BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
-                <StackPanel Background="Transparent" >
-                    <Rectangle Fill="#303030" Height="10" HorizontalAlignment="Right" Margin="0,-7,4,0" Width="10" UseLayoutRounding="False"  >
-                        <Rectangle.RenderTransform>
-                            <RotateTransform Angle="45" />
-                        </Rectangle.RenderTransform>
-                    </Rectangle>
-                    <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="0,0,10,0" />
-                    <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="0,0,10,0" />
-                </StackPanel>
-            </Border>
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Grid Background="#657384">
+                        <Grid Background="#AAb4b7bb" Margin="10,0,10,0">
+                            <TextBox x:Name="DemoCommentTextBox" Background="Transparent" HorizontalAlignment="Left" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="22" Height="66" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Century Gothic" FontWeight="DemiBold" Opacity="0.3"></TextBox>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+        </DataGrid>
+        <Button Name="SettingsButton" Click="SettingsButton_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" VerticalContentAlignment="Center" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Margin="0,2,2,0" Height="31" Width="31" >
+            <Image Source="Images/CSharpBoilerUI_Settings.png" />
+        </Button>
+        <Grid Name="SettingGrid" Visibility="Hidden" Background="#303030" Margin="0,38,4,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <Rectangle Fill="#303030" Height="10" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-7,4,0" Width="10" UseLayoutRounding="False" >
+                <Rectangle.RenderTransform>
+                    <RotateTransform Angle="45" />
+                </Rectangle.RenderTransform>
+            </Rectangle>
+            <StackPanel Background="Transparent" >
+                <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
+                <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="0,0,10,0" />
+                <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="0,0,10,0" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

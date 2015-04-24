@@ -477,13 +477,6 @@ namespace CSharpBoiler
             }
         }
 
-        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            //If we Resize our WIndow the Table needs to get automatically Resized too
-            if (e.NewSize.Height - HeaderDockPanel.Height - FooterDockPanel.Height - 10 > 0)
-                MainDataGrid.MaxHeight =  e.NewSize.Height - HeaderDockPanel.Height - FooterDockPanel.Height - 10;
-        }
-
         #endregion
     }
 }
