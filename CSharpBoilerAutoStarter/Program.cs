@@ -29,6 +29,8 @@ namespace CSharpBoilerAutoStarter
 
             //Alternative: pname[0].WaitForExit();
 
+            //CSharpBoiler.Properties.Settings.Default.InGameAudioDevice
+
             while (true)
             {
                 Process[] pname = Process.GetProcessesByName("csgo");

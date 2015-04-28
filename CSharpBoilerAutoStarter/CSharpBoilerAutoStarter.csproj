@@ -48,10 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CSharpBoiler\Properties\Settings.Designer.cs">
+      <Link>Settings.Designer.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\CSharpBoiler\Properties\Settings.settings">
+      <Link>Settings.settings</Link>
+    </None>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>

@@ -394,17 +394,7 @@ namespace CSharpBoiler
             xmlWriter.Serialize(additionalDemoDataStreamWriter, additionalDemoData);
             additionalDemoDataStreamWriter.Close();
 
-            /*
-            //DAT file Serialization
-            FileStream datFileStream = new FileStream(steamID + MATCHLISTTAG + DATAENDING, FileMode.OpenOrCreate, FileAccess.Write);
-            Serializer.Serialize<CMsgGCCStrike15_v2_MatchList>(datFileStream, mainMatchList);
-            datFileStream.Close();
-            
-
-            //Login Data Serialization
-            if(StartCheckBoxesUserControlInstance.IsAutoLoginEnabled())
-                StartCheckBoxesUserControlInstance.StoreLogin();
-            */
+            Properties.Settings.Default.Save();
 
             Application.Current.Shutdown(1);
         }

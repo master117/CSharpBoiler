@@ -194,6 +194,7 @@
                 <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
                 <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="0,0,10,0" />
                 <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="0,0,10,0" />
+                <uiControls:VibranceAndAudioUserControl x:Name="VibranceAndAudioUserControlInstance" Margin="0,0,10,0" />
             </StackPanel>
         </Grid>
     </Grid>

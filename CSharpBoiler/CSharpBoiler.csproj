@@ -77,6 +77,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AudioDeviceSwitcher">
+      <HintPath>..\packages\AudioDeviceSwitcher\AudioDeviceSwitcher.exe</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\ICSharpCode.SharpZipLib.Patched.0.86.4\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -94,6 +97,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -148,6 +152,10 @@
     <Compile Include="UIControls\VACStat_usUserControl.xaml.cs">
       <DependentUpon>VACStat_usUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UIControls\VibranceAndAudioUserControl.xaml.cs">
+      <DependentUpon>VibranceAndAudioUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UIControls\VibranceProxy.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -169,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UIControls\VACStat_usUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UIControls\VibranceAndAudioUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -194,7 +206,7 @@
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
@@ -239,6 +251,15 @@
   <ItemGroup>
     <Resource Include="Images\CSharpBoilerUI_Download-OFF_32x32.png" />
     <Resource Include="Images\CSharpBoilerUI_Download-ON_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="EndPointController.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CustomToolNamespace>"/"</CustomToolNamespace>
+    </Content>
+    <Content Include="vibranceDLL.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
