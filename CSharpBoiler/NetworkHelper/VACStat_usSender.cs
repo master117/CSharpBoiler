@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpBoiler.Helpers;
 using CSharpBoiler.Models;
+using CSharpBoiler.Properties;
 using Newtonsoft.Json.Linq;
 using SteamKit2.GC.CSGO.Internal;
 
@@ -21,10 +23,23 @@ namespace CSharpBoiler.NetworkHelper
         private const string APIURIGETLISTS = "list?_key=";
         private const string APIADDMANY = "list/add/many";
 
+        //VACStat.us WebApi only supports ~100 steamids per request
+        const int numberOfIDsPerRequest = 80;
+
         internal static void Initialize(HashSet<string> tempSteamIdsList)
         {
             steamIdsHashSet = tempSteamIdsList;
             initialized = true;
+
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.VACStat_usKey) && Properties.Settings.Default.VACStat_usListId != 0)
+            {
+                Send(Properties.Settings.Default.VACStat_usKey, Properties.Settings.Default.VACStat_usListId);
+            }
+            else
+            {
+                Properties.Settings.Default.VACStat_usKey = "";
+                Properties.Settings.Default.VACStat_usListId = 0;
+            }
         }
 
         public static Dictionary<int, string> GetLists(string APIKey)
@@ -61,10 +76,12 @@ namespace CSharpBoiler.NetworkHelper
                 }
                 catch (WebException e)
                 {
-                    Console.WriteLine(e.Message);
+                    ConsoleManager.Show();
+                    Console.WriteLine(e.Message + Resources.VACStat_usSender_GetLists_Problem_with_VacStat_us);
                 }
                 catch (Exception e)
                 {
+                    ConsoleManager.Show();
                     Console.WriteLine(e.Message);
                 }
             }
@@ -79,32 +96,41 @@ namespace CSharpBoiler.NetworkHelper
 
             using (var client = new WebClient())
             {
-                string steamIds = "";
-                foreach (var steamIdHashSetEntry in steamIdsHashSet)
+                try
                 {
-                    steamIds += steamIdHashSetEntry + ",";
+                    int numberOfRuns = (int)Math.Ceiling((double)steamIdsHashSet.Count / (double)numberOfIDsPerRequest);
+
+                    for (int i = 0; i < numberOfRuns; i++)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(APIURI + APIADDMANY + "?_key=" + APIKey + "&list_id=" + listId.ToString() + "&search=");
+
+                        for (int j = 0; j < numberOfIDsPerRequest; j++)
+                        {
+                            if (steamIdsHashSet.Count <= i * numberOfIDsPerRequest + j)
+                                break;
+
+                            sb.Append(steamIdsHashSet.ElementAt(i * numberOfIDsPerRequest + j) + ",");
+                        }
+                        sb.Remove(sb.Length - 1, 1);
+
+                        client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                        var response = client.UploadValues(sb.ToString(), "POST", new NameValueCollection());
+                    }
+
+                    //string result = System.Text.Encoding.UTF8.GetString(response);
+                    //ConsoleManager.Show();
+                    //Console.WriteLine(result);
                 }
-                steamIds = steamIds.Substring(1, steamIds.Length - 1);
-
-
-                string apiParameters = "?_key=" + APIKey + "&list_id=" + listId.ToString() + "&search=" + steamIds;
-                string targetUrl = APIURI + APIADDMANY + apiParameters;
-
-                /*
-                NameValueCollection  nameValueCollection = new NameValueCollection()
+                catch (Exception e)
                 {
-                    { "_key", APIKey },
-                    { "list_id", listId.ToString() },
-                    {"search", steamIds}
-                };
-                */
+                    Properties.Settings.Default.VACStat_usKey = "";
+                    Properties.Settings.Default.VACStat_usListId = 0;
 
-                client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                var response = client.UploadValues(targetUrl, "POST", new NameValueCollection());
-
-                string result = System.Text.Encoding.UTF8.GetString(response);
-
-                Console.WriteLine(result);
+                    ConsoleManager.Show();
+                    Console.WriteLine(e.Message + Resources.VACStat_usSender_Send_Problem_with_VacStat_us);
+                    Console.WriteLine(Resources.VACStat_usSender_Send_Removed_APIKey_and_ListId_to_ensure_security_and_stability_);
+                }
             };
         }
     }

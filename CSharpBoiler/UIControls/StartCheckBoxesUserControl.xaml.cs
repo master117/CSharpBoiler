@@ -23,7 +23,7 @@ namespace CSharpBoiler.UIControls
     /// </summary>
     public partial class StartCheckBoxesUserControl : UserControl
     {
-        public const string AutoStarterName = "CSharpBoilerStarter.exe";
+        public const string AutoStarterName = "CSharpBoiler.exe";
 
         public StartCheckBoxesUserControl()
         {
@@ -46,12 +46,16 @@ namespace CSharpBoiler.UIControls
                     // Add the value in the registry so that the application runs at startup
                     rkApp.SetValue(AutoStarterName, Directory.GetCurrentDirectory() + AutoStarterName);
             }
-            else
-            {
-                if (IsStartupItem())
-                    // Remove the value from the registry so that the application doesn't start
-                    rkApp.DeleteValue(AutoStarterName, false);
-            }
+        }
+
+        private void AutoStartCheckBox_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            // The path to the key where Windows looks for startup applications
+            RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            if (IsStartupItem())
+                // Remove the value from the registry so that the application doesn't start
+                rkApp.DeleteValue(AutoStarterName, false);
         }
 
         private bool IsStartupItem()
@@ -66,6 +70,7 @@ namespace CSharpBoiler.UIControls
                 // The value exists, the application is set to run at startup
                 return true;
         }
+
         #endregion
     }
 }

@@ -57,56 +57,31 @@ namespace CSharpBoiler
     public partial class MainWindow : Window
     {
         private ObservableCollection<MatchData> matchDataList = new ObservableCollection<MatchData>();
-        private AdditionalDemoData additionalDemoData = new AdditionalDemoData();
-        private long steamID;
+        private AdditionalMatchData _additionalMatchData = new AdditionalMatchData();
+        private long _accountId;
         private const string DEMOFOLDER = "Demos/";
         private const string DATAENDING = ".dat";
         private const string MATCHLISTTAG = "_matchlist";
-        private const string ADDITIONALDEMODATAFILE = "AdditionalDemoData.xml";
+        private const string ADDITIONALDEMODATAFILE = "AdditionalMatchData.xml";
         //Object where we store the matchList
         private CMsgGCCStrike15_v2_MatchList mainMatchList;
         private const long VOLVOMAGICNUMBER = 76561197960265728;
 
         #region Constructor
-        public MainWindow(long tempSteamID)
+        public MainWindow(long tempAccountId)
         {
             InitializeComponent();
-
-            //Setting SteamID
-            steamID = tempSteamID;
-
-            //Deserialize our stored data
-            DeserializeMatchData();
-            DeserializeAdditionalDemoData();
-
-            if (mainMatchList == null)
-                return;
-
-            //Parsing MatchData for UI
-            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, steamID); }));
-
-            //Thread for Uploading MatchLinks to DB
-            ThreadStart uploadThreadStart = this.UploadMatchData;
-            Thread uploadThread = new Thread(uploadThreadStart);
-            uploadThread.Start();
-
-            //Initializing VACStat_us Control
-            HashSet<string> steamIdsHashSet = new HashSet<string>();
-
-            foreach (var cDataGccStrike15V2MatchInfo in mainMatchList.matches)
-                foreach (var accountId in cDataGccStrike15V2MatchInfo.roundstats.reservation.account_ids)
-                    steamIdsHashSet.Add((accountId + VOLVOMAGICNUMBER).ToString());
-
-            VACStat_usSender.Initialize(steamIdsHashSet);
-  
             MainGrid.DataContext = this;
-            MouseDown += Window_MouseDown;
-        }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-                DragMove();
+            //Setting AccountID
+            _accountId = tempAccountId;
+
+            UpdateMatchlist();
+
+            //If CSGO is started and finished while CSharpBoiler is Running we want to UpdateTheMatchList
+            ThreadStart monitorCSGOThreadStart = MonitorCSGO;
+            Thread monitorCSGOThread = new Thread(monitorCSGOThreadStart);
+            monitorCSGOThread.Start();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -118,13 +93,73 @@ namespace CSharpBoiler
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             MainDataGrid.UnselectAll()));
         }
+        #endregion
+
+        #region CSGOStatus Control
+
+        //Monitors CSGO, if CSGO finishes we want to update the Matchlist
+        private void MonitorCSGO()
+        {
+            bool wasRunning = false;
+
+            while (true)
+            {
+                if (Process.GetProcessesByName("csgo").Length != 0)
+                {
+                    wasRunning = true; 
+                    VibranceAndAudioUserControlInstance.CSGOIsRunning();
+                }
+
+                if (Process.GetProcessesByName("csgo").Length == 0 && wasRunning)
+                {
+                    wasRunning = false;
+                    VibranceAndAudioUserControlInstance.CSGOWasRunning();
+
+                    long tempAccountId = BoilerHandler.StartAndGetAccountId();
+                    if (tempAccountId != 0 && tempAccountId != _accountId)
+                    {
+                        _accountId = tempAccountId;
+                        Properties.Settings.Default.LastAccountId = tempAccountId;
+                    }
+                    UpdateMatchlist();
+                }
+
+                Thread.Sleep(5000);
+            }
+        }
+
+        #endregion
+
+        #region UpdateMatchList
+
+        private void UpdateMatchlist()
+        {
+            //Deserialize our stored data
+            DeserializeMatchData();
+            DeserializeAdditionalDemoData();
+
+            //Parsing MatchData for UI
+            Application.Current.Dispatcher.Invoke(new Action(() => { ParseMatchData(mainMatchList, _accountId); }));
+
+            //Thread for Uploading MatchLinks to DB
+            ThreadStart uploadThreadStart = this.UploadMatchData;
+            Thread uploadThread = new Thread(uploadThreadStart);
+            uploadThread.Start();
+
+            //Initializing VACStat_us Control
+            HashSet<string> steamIdsHashSet = new HashSet<string>();
+            foreach (var cDataGccStrike15V2MatchInfo in mainMatchList.matches)
+                foreach (var accountId in cDataGccStrike15V2MatchInfo.roundstats.reservation.account_ids)
+                    steamIdsHashSet.Add((accountId + VOLVOMAGICNUMBER).ToString());
+            VACStat_usSender.Initialize(steamIdsHashSet);
+        }
 
         private void DeserializeMatchData()
         {
             //Retrieving old matches
-            if (File.Exists(steamID + MATCHLISTTAG + DATAENDING))
+            if (File.Exists(_accountId + MATCHLISTTAG + DATAENDING))
             {
-                FileStream datFileStream = new FileStream(steamID + MATCHLISTTAG + DATAENDING, FileMode.Open, FileAccess.Read);
+                FileStream datFileStream = new FileStream(_accountId + MATCHLISTTAG + DATAENDING, FileMode.Open, FileAccess.Read);
                 var tempMatchList = Serializer.Deserialize<CMsgGCCStrike15_v2_MatchList>(datFileStream);
                 datFileStream.Close();
 
@@ -140,12 +175,95 @@ namespace CSharpBoiler
                 if (File.Exists(DEMOFOLDER + ADDITIONALDEMODATAFILE))
                 {
                     System.Xml.Serialization.XmlSerializer xmlReader =
-                    new System.Xml.Serialization.XmlSerializer(typeof(AdditionalDemoData));
+                    new System.Xml.Serialization.XmlSerializer(typeof(AdditionalMatchData));
                     System.IO.StreamReader streamReader = new System.IO.StreamReader(DEMOFOLDER + ADDITIONALDEMODATAFILE);
-                    additionalDemoData = (AdditionalDemoData)xmlReader.Deserialize(streamReader);
+                    _additionalMatchData = (AdditionalMatchData)xmlReader.Deserialize(streamReader);
 
                     streamReader.Close();
                 }
+            }
+        }
+
+        //Parses The Data from MatchList to the UI Model
+        public void ParseMatchData(CMsgGCCStrike15_v2_MatchList matchlist, long accountId)
+        {
+            for (int i = matchlist.matches.Count - 1; i >= 0; i--)
+            {
+                try
+                {
+                    //Creating new MatchData
+                    MatchData matchData = new MatchData();
+                    //Date
+                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToLocalTime(); //.ToString("yyyy-MM-dd hh:mm");
+                    //Finding the Position of our own entries
+                    int j = 0;
+                    for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
+                    {
+                        if (matchlist.matches[i].roundstats.reservation.account_ids[j] == (uint)accountId)
+                            break;
+                    }
+                    //If the users AccountId is not in the Game, return
+                    //TODO: Figure out how this can happen
+                    if (j == 10)
+                        continue;
+
+                    //Kills, Assists, Deaths, MVP, Score, KD, Demo
+                    matchData.Kills = matchlist.matches[i].roundstats.kills[j];
+                    matchData.Assists = matchlist.matches[i].roundstats.assists[j];
+                    matchData.Deaths = matchlist.matches[i].roundstats.deaths[j];
+                    matchData.MVPs = matchlist.matches[i].roundstats.mvps[j];
+                    matchData.Score = matchlist.matches[i].roundstats.scores[j];
+
+                    if (matchData.Kills != 0 && matchData.Deaths != 0)
+                        matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths) * 100)) / 100);
+                    else
+                        matchData.KD = 0;
+
+                    matchData.Demo = matchlist.matches[i].roundstats.map; //new DemoButtonUserControl(matchlist.matches[i].roundstats.Map);
+
+                    //Getting DemoComment
+                    if (_additionalMatchData.ContainsComment(matchData.Demo))
+                    {
+                        matchData.DemoComment = _additionalMatchData.GetComment(matchData.Demo);
+                    }
+
+                    //Calculating if we won the match
+                    if (j < matchlist.matches[i].roundstats.reservation.account_ids.Count / 2)
+                    {
+                        //Overall Score, ex. 16:13
+                        matchData.Result = matchlist.matches[i].roundstats.team_scores[0].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[1].ToString();
+                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[0] > matchlist.matches[i].roundstats.team_scores[1]);
+                    }
+                    else
+                    {
+                        //Overall Score, ex. 16:13
+                        matchData.Result = matchlist.matches[i].roundstats.team_scores[1].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[0].ToString();
+                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[1] > matchlist.matches[i].roundstats.team_scores[0]);
+                    }
+
+                    //Calculating if we downloaded the Demo
+                    UpdateDownloadedList();
+
+                    //adding to the MainList of MatchData
+                    matchDataList.Add(matchData);
+                }
+                catch (Exception e)
+                {
+                    ConsoleManager.Show();
+                    Console.Write(e.Message);
+                }
+            }
+        }
+
+        private void UpdateDownloadedList()
+        {
+            //We could only check for Demos that are not already marked as downloaded, but i like doublechecking here
+            foreach (var matchData in matchDataList)
+            {
+                string[] tempUrlSplit = matchData.Demo.Split('/');
+                string tempDemoFileName = tempUrlSplit[tempUrlSplit.Length - 1];
+                matchData.Downloaded =
+                    (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
             }
         }
         #endregion
@@ -173,102 +291,6 @@ namespace CSharpBoiler
 
         #endregion
 
-        #region MatchData Parsing
-        //
-        // Databinding of the Table
-        //
-
-        //Parses The Data from MatchList to the UI Model
-        public void ParseMatchData(CMsgGCCStrike15_v2_MatchList matchlist, long steamID)
-        {
-            for (int i = matchlist.matches.Count - 1; i >= 0; i--)
-            {
-                try
-                {
-
-                    //Creating new MatchData
-                    MatchData matchData = new MatchData();
-                    //Date
-                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToLocalTime(); //.ToString("yyyy-MM-dd hh:mm");
-                    //Finding the Position of our own entries
-                    int j = 0;
-                    for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)
-                    {
-                        if (matchlist.matches[i].roundstats.reservation.account_ids[j] == (uint)steamID)
-                            break;
-                    }
-                    //Kills, Assists, Deaths, MVP, Score, KD, Demo
-                    matchData.Kills = matchlist.matches[i].roundstats.kills[j];
-                    matchData.Assists = matchlist.matches[i].roundstats.assists[j];
-                    matchData.Deaths = matchlist.matches[i].roundstats.deaths[j];
-                    matchData.MVPs = matchlist.matches[i].roundstats.mvps[j];
-                    matchData.Score = matchlist.matches[i].roundstats.scores[j];
-
-                    if (matchData.Kills != 0 && matchData.Deaths != 0)
-                    {
-                        matchData.KD = ((double)((int)(((double)matchData.Kills / matchData.Deaths) * 100)) / 100);
-                    }
-                    else
-                    {
-                        matchData.KD = 0;
-                    }
-
-                    matchData.Demo = matchlist.matches[i].roundstats.map; //new DemoButtonUserControl(matchlist.matches[i].roundstats.Map);
-
-                    //Getting DemoComment, K3, K4, K5, HS
-                    if (additionalDemoData.ContainsComment(matchData.Demo))
-                    {
-                        matchData.DemoComment = additionalDemoData.GetComment(matchData.Demo);
-                    }
-                    if (additionalDemoData.ContainsK3(matchData.Demo))
-                    {
-                        matchData.K3 = additionalDemoData.GetK3(matchData.Demo);
-                    }
-                    if (additionalDemoData.ContainsK4(matchData.Demo))
-                    {
-                        matchData.K4 = additionalDemoData.GetK4(matchData.Demo);
-                    }
-                    if (additionalDemoData.ContainsK5(matchData.Demo))
-                    {
-                        matchData.K5 = additionalDemoData.GetK5(matchData.Demo);
-                    }
-                    if (additionalDemoData.ContainsHS(matchData.Demo))
-                    {
-                        matchData.HS = additionalDemoData.GetHS(matchData.Demo);
-                    }
-
-
-                    //Calculating if we won the match
-                    if (j < matchlist.matches[i].roundstats.reservation.account_ids.Count / 2)
-                    {
-                        //Overall Score, ex. 16:13
-                        matchData.Result = matchlist.matches[i].roundstats.team_scores[0].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[1].ToString();
-                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[0] > matchlist.matches[i].roundstats.team_scores[1]);
-                    }
-                    else
-                    {
-                        //Overall Score, ex. 16:13
-                        matchData.Result = matchlist.matches[i].roundstats.team_scores[1].ToString() + ":" + matchlist.matches[i].roundstats.team_scores[0].ToString();
-                        matchData.Won = (matchlist.matches[i].roundstats.team_scores[1] > matchlist.matches[i].roundstats.team_scores[0]);
-                    }
-
-                    //Calculating if we downloaded the Demo
-                    string[] tempURLSplit = matchData.Demo.Split('/');
-                    string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                    matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
-
-                    //adding to the MainList of MatchData
-                    matchDataList.Add(matchData);
-                }
-                catch(Exception e)
-                {
-                    Console.Write(e.StackTrace);
-                }
-            }
-        }
-
-        #endregion
-
         #region DemoDownload
         /// 
         /// Demo Download Section
@@ -276,26 +298,36 @@ namespace CSharpBoiler
 
         private void DemoDownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            Button tempButton = (Button)sender;
-            string URL = (string)tempButton.Tag.ToString();
-
-            string[] tempURLSplit = URL.Split('/');
-            string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-
-            if (!Directory.Exists(DEMOFOLDER))
-                Directory.CreateDirectory(DEMOFOLDER);
-
-            if (!File.Exists(DEMOFOLDER + tempDemoFileName))
+            try
             {
-                WebClient webClient = new WebClient();
-                webClient.DownloadFileCompleted += (senderv, ev) => Completed(senderv, ev, tempDemoFileName);
-                webClient.DownloadProgressChanged += (senderv, ev) => ProgressChanged(senderv, ev, URL); //new DownloadProgressChangedEventHandler(ProgressChanged);
-                webClient.DownloadFileAsync(new Uri(URL), DEMOFOLDER + tempDemoFileName);
+                Button tempButton = (Button)sender;
+                string URL = (string)tempButton.Tag.ToString();
+
+                string[] tempURLSplit = URL.Split('/');
+                string tempZippedDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
+                //case: .bz2
+                string tempDemoFileName = tempZippedDemoFileName.Substring(0, tempZippedDemoFileName.Length - 4);
+
+                if (!Directory.Exists(DEMOFOLDER))
+                    Directory.CreateDirectory(DEMOFOLDER);
+
+                if (!File.Exists(DEMOFOLDER + tempDemoFileName))
+                {
+                    WebClient webClient = new WebClient();
+                    webClient.DownloadFileCompleted += (senderv, ev) => Completed(senderv, ev, tempZippedDemoFileName);
+                    webClient.DownloadProgressChanged += (senderv, ev) => ProgressChanged(senderv, ev, URL); //new DownloadProgressChangedEventHandler(ProgressChanged);
+                    webClient.DownloadFileAsync(new Uri(URL), DEMOFOLDER + tempZippedDemoFileName);
+                }
+                else
+                {
+                    File.Delete(DEMOFOLDER + tempDemoFileName);
+                    MessageBox.Show("Demo was already Downloaded, deleted Demo");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                File.Delete(DEMOFOLDER + tempDemoFileName);
-                MessageBox.Show("Demo was already Downloaded, deleted Demo");
+                ConsoleManager.Show();
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -314,120 +346,77 @@ namespace CSharpBoiler
         {
             await Task.Run(() =>
             {
+                //Checking if the Download was succesful
                 if (e.Error != null)
                 {
                     MessageBox.Show("Demo is too old, Download no Longer Available");
                     return;
                 }
 
+                //Unzipping
                 UnZipDemo(tempDemoFileName);
 
+                //Deleting the zipped remains
                 if (Directory.Exists(DEMOFOLDER) && File.Exists(DEMOFOLDER + tempDemoFileName))
                     File.Delete(DEMOFOLDER + tempDemoFileName);
 
+                //Updating the list which Demos are already Downloaded
                 UpdateDownloadedList();
-            }).ConfigureAwait(continueOnCapturedContext: false);
+            }).ConfigureAwait(false);
         }
 
         private void UnZipDemo(string zippedDemoName)
         {
-            if (Directory.Exists(DEMOFOLDER))
+            //case: .bz2
+            if (Directory.Exists(DEMOFOLDER)
+                && File.Exists(DEMOFOLDER + zippedDemoName)
+                && zippedDemoName.Substring(zippedDemoName.Length - 4, 4) == ".bz2"
+                && !File.Exists(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4)))
             {
-                if (File.Exists(DEMOFOLDER + zippedDemoName) && zippedDemoName.Substring(zippedDemoName.Length - 4, 4) == ".bz2" && !File.Exists(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4)))
-                {
-                    FileStream inputStream = File.Open(DEMOFOLDER + zippedDemoName, FileMode.Open, FileAccess.Read);
-                    //- .bz2
-                    FileStream outputStream = File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
-                    BZip2.Decompress(inputStream, outputStream, true);
-                    inputStream.Close();
-                    outputStream.Close();                   
-                }
+                FileStream inputStream = File.Open(DEMOFOLDER + zippedDemoName, FileMode.Open, FileAccess.Read);
+                
+                FileStream outputStream =
+                    File.Create(DEMOFOLDER + zippedDemoName.Substring(0, zippedDemoName.Length - 4));
+                BZip2.Decompress(inputStream, outputStream, true);
+                inputStream.Close();
+                outputStream.Close();
             }
         }
-
-        private void UpdateDownloadedList()
-        {
-            foreach (var matchData in matchDataList)
-            {
-                if (!matchData.Downloaded)
-                {
-                    string[] tempURLSplit = matchData.Demo.Split('/');
-                    string tempDemoFileName = tempURLSplit[tempURLSplit.Length - 1];
-                    matchData.Downloaded = (File.Exists(DEMOFOLDER + tempDemoFileName.Substring(0, tempDemoFileName.Length - 4)));
-                }
-            }
-        }
-
-        #endregion
-
-        #region DemoAnalyze
-
-        public MatchData GetMatchData(string demoURL)
-        {
-            return matchDataList.SingleOrDefault(i => i.Demo == demoURL);
-        }
-
         #endregion
 
         #region Closing & Demo Comment Serialization
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
         //
-        // Closing & Demo Comment Serialization
+        // Closing & Comment Serialization
         //
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            //AdditionalDemoDataSerialization
+            //AdditionalMatchDataSerialization
             ExtractAdditionalDemoData();
 
             if (!Directory.Exists(DEMOFOLDER))
                 Directory.CreateDirectory(DEMOFOLDER);
 
-            XmlSerializer xmlWriter = new XmlSerializer(typeof(AdditionalDemoData));
-
-            StreamWriter additionalDemoDataStreamWriter = new StreamWriter(DEMOFOLDER + "AdditionalDemoData.xml");
-            xmlWriter.Serialize(additionalDemoDataStreamWriter, additionalDemoData);
+            XmlSerializer xmlWriter = new XmlSerializer(typeof(AdditionalMatchData));
+            StreamWriter additionalDemoDataStreamWriter = new StreamWriter(DEMOFOLDER + "AdditionalMatchData.xml");
+            xmlWriter.Serialize(additionalDemoDataStreamWriter, _additionalMatchData);
             additionalDemoDataStreamWriter.Close();
 
+            //Saving Changed Settings
             Properties.Settings.Default.Save();
 
+            //Shutdown
             Application.Current.Shutdown(1);
         }
 
         private void ExtractAdditionalDemoData()
         {
             foreach (MatchData tempMatchData in matchDataList)
-            {
-
-                additionalDemoData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
-
-                if (tempMatchData.K3 != 0)
-                {
-                    additionalDemoData.AddK3(tempMatchData.Demo, tempMatchData.K3);
-                }
-
-                if (tempMatchData.K4 != 0)
-                {
-                    additionalDemoData.AddK4(tempMatchData.Demo, tempMatchData.K4);
-                }
-
-                if (tempMatchData.K5 != 0)
-                {
-                    additionalDemoData.AddK5(tempMatchData.Demo, tempMatchData.K5);
-                }
-
-                if (tempMatchData.HS != 0)
-                {
-                    additionalDemoData.AddHS(tempMatchData.Demo, tempMatchData.HS);
-                }
-            }
+                _additionalMatchData.AddComment(tempMatchData.Demo, tempMatchData.DemoComment);
         }
         #endregion
+
+
 
         #region Events
 

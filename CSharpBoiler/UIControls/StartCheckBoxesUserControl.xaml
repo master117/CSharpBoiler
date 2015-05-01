@@ -6,7 +6,7 @@
              mc:Ignorable="d" >
     <Grid>
         <StackPanel>
-            <CheckBox Name="AutoStartCheckBox" Margin="5,5,0,0" Checked="AutoStartCheckBox_OnChecked" Content="Autostart CSharpBoiler after CSGO closes" Foreground="White" FontFamily="Century Gothic" FontSize="14" />
+            <CheckBox Name="AutoStartCheckBox" Unchecked="AutoStartCheckBox_OnUnchecked" Checked="AutoStartCheckBox_OnChecked" Content="Autostart CSharpBoiler after CSGO closes" Foreground="White" FontSize="14" />
         </StackPanel>
             
     </Grid>

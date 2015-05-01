@@ -1,9 +1,9 @@
 ﻿<Window x:Class="CSharpBoiler.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:m="clr-namespace:CSharpBoiler"
         xmlns:uiControls="clr-namespace:CSharpBoiler.UIControls"
         xmlns:converter="clr-namespace:CSharpBoiler.Converter"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="CSharpBoiler © Johannes Gocke, 2015 | Powered by Steam" Loaded="Window_Loaded" Closing="Window_Closing"
         Icon="Ico/Boiler.ico" Height="670" Width="820">
     <Window.Resources>
@@ -175,7 +175,7 @@
                 <DataTemplate>
                     <Grid Background="#657384">
                         <Grid Background="#AAb4b7bb" Margin="10,0,10,0">
-                            <TextBox x:Name="DemoCommentTextBox" Background="Transparent" HorizontalAlignment="Left" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="22" Height="66" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Century Gothic" FontWeight="DemiBold" Opacity="0.3"></TextBox>
+                            <toolkit:WatermarkTextBox Watermark="Comment" x:Name="DemoCommentTextBox" Background="Transparent" HorizontalAlignment="Stretch" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="22" MinHeight="66" AcceptsReturn="True" TextWrapping="Wrap"  FontWeight="DemiBold" Opacity="0.4" />
                         </Grid>
                     </Grid>
                 </DataTemplate>
@@ -191,10 +191,10 @@
                 </Rectangle.RenderTransform>
             </Rectangle>
             <StackPanel Background="Transparent" >
-                <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" />
-                <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="0,0,10,0" />
-                <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="0,0,10,0" />
-                <uiControls:VibranceAndAudioUserControl x:Name="VibranceAndAudioUserControlInstance" Margin="0,0,10,0" />
+                <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" Margin="5,0,0,0" />
+                <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="5,5,0,0" />
+                <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="5,5,0,0" />
+                <uiControls:VibranceAndAudioUserControl x:Name="VibranceAndAudioUserControlInstance" Margin="5,5,0,5" />
             </StackPanel>
         </Grid>
     </Grid>

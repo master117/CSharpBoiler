@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using SteamKit2.GC.CSGO.Internal;
 using System.IO;
+using CSharpBoiler.Helpers;
 using CSharpBoiler.Models;
+using CSharpBoiler.Properties;
 
 namespace CSharpBoiler.NetworkHelper
 {
@@ -75,11 +77,14 @@ namespace CSharpBoiler.NetworkHelper
                     }
                     catch (WebException e)
                     {
-                        Console.WriteLine(e.Message);
+                        ConsoleManager.Show();
+                        Console.WriteLine(e.Message + Resources.MatchLinkSender_Send_Problem_with_boiler_stats_com);
+                        break;
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
+                        break;
                     }
                 }
             }

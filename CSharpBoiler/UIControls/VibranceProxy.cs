@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using MessageBox = System.Windows.MessageBox;
 
 namespace CSharpBoiler.UIControls
 {
@@ -331,7 +330,6 @@ namespace CSharpBoiler.UIControls
         public void HandleDvc()
         {
             bool isChanged = false;
-            bool wasStarted = false;
             while (VibranceInfo.shouldRun)
             {
                 IntPtr hwnd = IntPtr.Zero;
@@ -358,8 +356,8 @@ namespace CSharpBoiler.UIControls
 
                             if (!isChanged)
                             {
-                                setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingActive);
                                 isChanged = true;
+                                setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingActive);
                             }
                         }
                     }
@@ -371,12 +369,11 @@ namespace CSharpBoiler.UIControls
                         VibranceInfo.displayHandles.ForEach(
                             handle => setDVCLevel(handle, VibranceInfo.userVibranceSettingDefault));
                     }
-
                     break;
                 }
-            }
 
-            System.Threading.Thread.Sleep(VibranceInfo.sleepInterval);
+                System.Threading.Thread.Sleep(VibranceInfo.sleepInterval);
+            }         
 
             HandleDvcExit();
         }

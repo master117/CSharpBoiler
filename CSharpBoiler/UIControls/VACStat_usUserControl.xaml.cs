@@ -29,6 +29,8 @@ namespace CSharpBoiler.UIControls
             if (Properties.Settings.Default.VACStat_usKey != "")
             {
                 VacStat_usCheckBox.IsChecked = true;
+                ApikeyDockPanel.Visibility = Visibility.Collapsed;
+                ListsDockPanel.Visibility = Visibility.Visible;
             }
         }
 
@@ -40,6 +42,7 @@ namespace CSharpBoiler.UIControls
         private void VacStat_usCheckBox_OnChecked(object sender, RoutedEventArgs e)
         {
             ApikeyDockPanel.Visibility = Visibility.Visible;
+            ListsDockPanel.Visibility = Visibility.Collapsed;
         }
 
         private void VacStat_usCheckBox_OnUnchecked(object sender, RoutedEventArgs e)
@@ -51,8 +54,7 @@ namespace CSharpBoiler.UIControls
 
         private void GetListsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.VACStat_usKey = VAC_Stats_usAPIKEYTextBox.Text;
-            VAC_Stats_usListComboBox.ItemsSource = VACStat_usSender.GetLists(VAC_Stats_usAPIKEYTextBox.Text);
+            VAC_Stats_usListComboBox.ItemsSource = VACStat_usSender.GetLists(Properties.Settings.Default.VACStat_usKey);
             VAC_Stats_usListComboBox.SelectedIndex = 0;
 
             ApikeyDockPanel.Visibility = Visibility.Collapsed;
@@ -68,6 +70,7 @@ namespace CSharpBoiler.UIControls
             {
                 ListsDockPanel.Visibility = Visibility.Collapsed;
 
+                Properties.Settings.Default.VACStat_usListId = listDictionary.ElementAt(selectedIndex).Key;
                 VACStat_usSender.Send(Properties.Settings.Default.VACStat_usKey, listDictionary.ElementAt(selectedIndex).Key);
             }
         }

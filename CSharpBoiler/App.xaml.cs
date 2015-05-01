@@ -21,8 +21,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
@@ -39,28 +41,36 @@ namespace CSharpBoiler
             FrameworkElement.LanguageProperty.OverrideMetadata(
                 typeof(FrameworkElement), new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-            //int steamId = StartBoiler.StartAndGetSteamID();
-
-            int steamId = 33990548;
-
-            if (steamId == 0)
+            bool steamAlreadyRunning = true;
+            while (true)
             {
-                MessageBox.Show("Steam must be running for CSharpBoiler to work.\n Open Steam and close this MessageBox afterwards.");
-                steamId = StartBoiler.StartAndGetSteamID();
+                if (Process.GetProcessesByName("Steam").Length != 0)
+                    break;
+
+                steamAlreadyRunning = false;
+                Thread.Sleep(5000);
             }
 
-            if (steamId == 0)
+            //Give Steam enough Time to Start
+            if(!steamAlreadyRunning)             
+                Thread.Sleep(5000);
+
+            long accountId = CSharpBoiler.Properties.Settings.Default.LastAccountId;
+            long tempAccountId = 0; //BoilerHandler.StartAndGetAccountId();
+            if (tempAccountId != 0)
             {
-                MessageBox.Show("Still no running SteamClient found. Closing.");
-                Environment.Exit(1);
+                accountId = tempAccountId;
+                CSharpBoiler.Properties.Settings.Default.LastAccountId = tempAccountId;
             }
 
-            if (steamId != 0)
+            if (accountId != 0)
             {
-                var mainWindow = new MainWindow(steamId);
+                var mainWindow = new MainWindow(accountId);
                 mainWindow.Closed += MainWindow_Closed;
-                mainWindow.Show();
+                mainWindow.ShowDialog();          
             }
+
+            Environment.Exit(0);
         }
 
         void MainWindow_Closed(object sender, EventArgs e)

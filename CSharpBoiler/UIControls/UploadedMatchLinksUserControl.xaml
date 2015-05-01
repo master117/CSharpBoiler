@@ -6,7 +6,7 @@
              mc:Ignorable="d" >
     <Grid>
         <DockPanel>
-            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Name="UploadedMatchLinksTextBlock" Margin="5,2,0,0" Text="Uploading MatchLinks..." Foreground="White" FontFamily="Century Gothic" FontSize="14" />
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Name="UploadedMatchLinksTextBlock" Text="Uploading MatchLinks..." Foreground="White" FontSize="14" />
         </DockPanel>
     </Grid>
 </UserControl>

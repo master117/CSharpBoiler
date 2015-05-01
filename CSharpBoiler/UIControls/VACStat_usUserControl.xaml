@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:properties="clr-namespace:CSharpBoiler.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid>
-        <DockPanel Margin="5,6,0,0" VerticalAlignment="Center">
-            <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="26" FontFamily="Century Gothic" FontSize="14" />
+        <DockPanel VerticalAlignment="Center">
+            <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="26" FontSize="14" />
             <DockPanel Margin="5,0" Name="ApikeyDockPanel" Visibility="Collapsed">
-                <toolkit:WatermarkTextBox Name="VAC_Stats_usAPIKEYTextBox" Watermark="API Key, see VACStats for more Info" VerticalAlignment="Center" HorizontalAlignment="Left" Height="26" Width="230" FontSize="14" />
+                <toolkit:WatermarkTextBox Name="VAC_Stats_usAPIKEYTextBox" Watermark="API Key, see VACStats for more Info" Text="{Binding Source={x:Static properties:Settings.Default}, Path=VACStat_usKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Left" Height="26" Width="230" FontSize="14" />
                 <Button Name="ExplanationButton" Content="?" Margin="5,0" BorderThickness="0" BorderBrush="Transparent" Background="Transparent" Foreground="White" FontWeight="Bold" FontSize="18"  Click="ExplanationButton_OnClick"></Button>
                 <Button Name="GetListsButton" Content="Get My Lists" Click="GetListsButton_OnClick" Height="26" Width="100" FontSize="14" Margin="5,0" VerticalAlignment="Center" HorizontalAlignment="Left" />
             </DockPanel>
