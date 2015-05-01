@@ -28,7 +28,6 @@ Reminder: copy your old one before renaming just to make sure there are no bugs 
 * [steamKit2](https://github.com/SteamRE/SteamKit)
 
 ## TODO ##
-* Many Changes and Improvements to the Analysis, Scoreboard, Accuracy etc
 * Asking Reddit for more Features
 
 ### Thanks ###
