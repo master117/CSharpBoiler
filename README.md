@@ -4,7 +4,7 @@
 
 CSharpBoiler is a tool to see al your recent matches, comment on them and download the. More coming soon.
 Note: The new matchdata filename should be: "accountid"_matchlist.dat, in the last releases it was "accountid".dat, you might have to rename. 
-Best practice Reminder: copy your old one before renaming just to make sure there are no bugs and you lose your data. Next 100% Stable release will be marked.
+Reminder: copy your old one before renaming just to make sure there are no bugs and you lose your data. Next 100% Stable release will be marked.
 
 ![CurrentCSharpBoilerScreenShot.png](https://bitbucket.org/repo/Az8xKM/images/1364993121-CurrentCSharpBoilerScreenShot.png)
 
