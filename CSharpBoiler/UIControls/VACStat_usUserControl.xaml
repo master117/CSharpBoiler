@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid>
-        <DockPanel VerticalAlignment="Center">
+        <DockPanel VerticalAlignment="Center" Visibility="Hidden">
             <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="26" FontSize="14" />
             <DockPanel Margin="5,0" Name="ApikeyDockPanel" Visibility="Collapsed">
                 <toolkit:WatermarkTextBox Name="VAC_Stats_usAPIKEYTextBox" Watermark="API Key, see VACStats for more Info" Text="{Binding Source={x:Static properties:Settings.Default}, Path=VACStat_usKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Left" Height="26" Width="230" FontSize="14" />
