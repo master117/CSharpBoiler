@@ -2,7 +2,7 @@
 
 © [JOHANNES GOCKE](http://steamcommunity.com/id/master117/)
 
-CSharpBoiler is a tool to see all your recent matches, comment on them and download the. More coming soon.
+CSharpBoiler is a tool to see all your recent matches, comment on them and download them. More coming soon.
 
 
 Note: The new matchdata filename should be: "accountid"_matchlist.dat, in the last releases it was "accountid".dat, you might have to rename. 
