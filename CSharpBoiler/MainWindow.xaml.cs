@@ -194,7 +194,7 @@ namespace CSharpBoiler
                     //Creating new MatchData
                     MatchData matchData = new MatchData();
                     //Date
-                    matchData.Date = TimeHelper.UnixTimeStampToDateTime(matchlist.matches[i].matchtime).ToLocalTime(); //.ToString("yyyy-MM-dd hh:mm");
+                    matchData.Date = TimeHelper.UnixTimeStampInSecondsToDateTime(matchlist.matches[i].matchtime).ToLocalTime(); //.ToString("yyyy-MM-dd hh:mm");
                     //Finding the Position of our own entries
                     int j = 0;
                     for (; j < matchlist.matches[i].roundstats.reservation.account_ids.Count; j++)

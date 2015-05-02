@@ -28,6 +28,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
+using CSharpBoiler.Helpers;
 
 namespace CSharpBoiler
 {
@@ -41,42 +42,38 @@ namespace CSharpBoiler
             FrameworkElement.LanguageProperty.OverrideMetadata(
                 typeof(FrameworkElement), new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-            bool steamAlreadyRunning = true;
-            while (true)
+            //Retrieve AccountId
+            //Case1: CSharpBoiler was started while Steam is running
+            if (Process.GetProcessesByName("Steam").Length != 0)
             {
-                if (Process.GetProcessesByName("Steam").Length != 0)
-                    break;
-
-                steamAlreadyRunning = false;
-                Thread.Sleep(5000);
+                long tempAccountId = BoilerHandler.StartAndGetAccountId();
+                if (tempAccountId != 0)
+                    CSharpBoiler.Properties.Settings.Default.LastAccountId = tempAccountId;
+            }
+            //Case2: CSharpboiler was started with Windows or while Steam wasn't running, BUT the accountid from the last Session is available
+            //If Case 1 or 2 apply, start MainWindow
+            if (CSharpBoiler.Properties.Settings.Default.LastAccountId != 0)
+            {
+                var mainWindow = new MainWindow(CSharpBoiler.Properties.Settings.Default.LastAccountId);
+                //Note: ShowDialog is Blocking
+                mainWindow.ShowDialog();  
+            }
+            else
+            {
+                //Neither Case 1 nor 2 were reached, meaning the App is openend for the first time AND Steam isn't running. 
+                //Informing the user that Steam is Required
+                MessageBox.Show(
+                    "It appears that you run CSharpBoiler for the first time." +
+                    "\n\r Steam is required to be running at the first start of CSharpBoiler." +
+                    "\n\r\n\r The matchlist is updated:" +
+                    "\n\r - when starting CSharpBoiler while Steam is running " +
+                    "\n\r - when closing CSGO." +
+                    "\n\r\n\r - Closing CSharpBoiler. -"
+                    );
             }
 
-            //Give Steam enough Time to Start
-            if(!steamAlreadyRunning)             
-                Thread.Sleep(5000);
-
-            long accountId = CSharpBoiler.Properties.Settings.Default.LastAccountId;
-            long tempAccountId = 0; //BoilerHandler.StartAndGetAccountId();
-            if (tempAccountId != 0)
-            {
-                accountId = tempAccountId;
-                CSharpBoiler.Properties.Settings.Default.LastAccountId = tempAccountId;
-            }
-
-            if (accountId != 0)
-            {
-                var mainWindow = new MainWindow(accountId);
-                mainWindow.Closed += MainWindow_Closed;
-                mainWindow.ShowDialog();          
-            }
-
+            //If we received no accountId or MainWindow.ShowDialog was terminated we end the App
             Environment.Exit(0);
-        }
-
-        void MainWindow_Closed(object sender, EventArgs e)
-        {
-            Environment.Exit(0);
-        }
-        
+        }        
     }
 }

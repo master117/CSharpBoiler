@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:properties="clr-namespace:CSharpBoiler.Properties"
-             mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="800">
+             mc:Ignorable="d">
     <Grid>
         <DockPanel VerticalAlignment="Center" Visibility="Hidden">
             <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="26" FontSize="14" />
