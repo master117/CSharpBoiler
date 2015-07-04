@@ -60,10 +60,10 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="DownloadButtonImageStyle" TargetType="Image">
-            <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-OFF_32x32.png" />
+            <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-OFF.png" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Downloaded}" Value="True">
-                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-ON_32x32.png" />
+                    <Setter Property="Source" Value="Images/CSharpBoilerUI_Download-ON.png" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -89,7 +89,7 @@
     </Window.Resources>
 
     <Grid Name="MainGrid" Background="#657384">
-        <Rectangle Fill="#202225" Height="35" VerticalAlignment="Top"/>
+        <Rectangle Fill="#202225" Height="52" VerticalAlignment="Top"/>
         <DataGrid Name="MainDataGrid" AutoGenerateColumns="False" VerticalAlignment="Top"
                     HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Visible"                   
                     CanUserAddRows="False" RowHeaderWidth="0" GridLinesVisibility="None"
@@ -103,7 +103,7 @@
                     <Setter Property="Background" Value="#202225" />
                     <Setter Property="Foreground" Value="WhiteSmoke" />
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
-                    <Setter Property="Height" Value="35" />
+                    <Setter Property="Height" Value="52" />
                     <Setter Property="FontSize" Value="26" />
                 </Style>
             </DataGrid.ColumnHeaderStyle>
@@ -132,7 +132,7 @@
                 <DataGridTemplateColumn Header="" Width="50">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Height="32" Width="32" Style="{StaticResource ResultImage}" />
+                            <Image Margin="2" Height="34" Width="34" Stretch="Fill" Style="{StaticResource ResultImage}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -154,7 +154,7 @@
                                     </ProgressBar.RenderTransform>
                                 </ProgressBar>
                                 <Button x:Name="DemoDownloadButton" Style="{StaticResource NoHoverButtonStyle}" Tag="{Binding Demo}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Click="DemoDownloadButton_Click">
-                                    <Image Style="{StaticResource DownloadButtonImageStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="32" Height="32" Stretch="Fill" />
+                                    <Image Style="{StaticResource DownloadButtonImageStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2" Width="34" Height="34" Stretch="Fill" />
                                 </Button>
                             </Grid>
                         </DataTemplate>
@@ -163,8 +163,8 @@
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Margin="5,0" x:Name="ShowComment" Style="{StaticResource NoHoverButtonStyle}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Width="32" Height="32" Click="ShowComment_OnClick">
-                                <Image Style="{StaticResource ShowCommentButtonImageStyle}" />
+                            <Button Margin="5,0" x:Name="ShowComment" Style="{StaticResource NoHoverButtonStyle}" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Click="ShowComment_OnClick">
+                                <Image Style="{StaticResource ShowCommentButtonImageStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2" Width="34" Height="34" Stretch="Fill" />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -173,7 +173,7 @@
 
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
-                    <Grid Background="#657384">
+                    <Grid Background="#657384" >
                         <Grid Background="#AAb4b7bb" Margin="10,0,10,0">
                             <toolkit:WatermarkTextBox Watermark="Comment" x:Name="DemoCommentTextBox" Background="Transparent" HorizontalAlignment="Stretch" Text="{Binding DemoComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="22" MinHeight="66" AcceptsReturn="True" TextWrapping="Wrap"  FontWeight="DemiBold" Opacity="0.4" />
                         </Grid>
@@ -181,11 +181,11 @@
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
         </DataGrid>
-        <Button Name="SettingsButton" Click="SettingsButton_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" VerticalContentAlignment="Center" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Margin="0,2,2,0" Height="31" Width="31" >
-            <Image Source="Images/CSharpBoilerUI_Settings.png" />
+        <Button Name="SettingsButton" Click="SettingsButton_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Margin="6" Padding="0" Style="{StaticResource NoHoverButtonStyle}" >
+            <Image Source="Images/CSharpBoilerUI_Settings.png" Height="40" Width="40" />
         </Button>
-        <Grid Name="SettingGrid" Visibility="Hidden" Background="#303030" Margin="0,38,4,0" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <Rectangle Fill="#303030" Height="10" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-7,4,0" Width="10" UseLayoutRounding="False" >
+        <Grid Name="SettingGrid" Visibility="Hidden" Background="#303030" Margin="0,56,4,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <Rectangle Fill="#303030" Height="15" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-10,7,0" Width="15" UseLayoutRounding="False" >
                 <Rectangle.RenderTransform>
                     <RotateTransform Angle="45" />
                 </Rectangle.RenderTransform>
@@ -193,7 +193,8 @@
             <StackPanel Background="Transparent" >
                 <uiControls:UploadedMatchLinksUserControl x:Name="UploadedMatchLinksUserControlInstance" Margin="5,0,0,0" />
                 <uiControls:StartCheckBoxesUserControl x:Name="StartCheckBoxesUserControlInstance" Margin="5,5,0,0" />
-                <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Margin="5,5,0,0" />
+                <uiControls:VACStat_usUserControl x:Name="VACStatsUserControlInstance" Visibility="Collapsed" Margin="5,5,0,0" />
+                <uiControls:VacWatch_nlUserControl x:Name="VacWatch_nlUserControlInstance" Visibility="Collapsed"  Margin="5,5,0,0" />
                 <uiControls:VibranceAndAudioUserControl x:Name="VibranceAndAudioUserControlInstance" Margin="5,5,0,5" />
             </StackPanel>
         </Grid>

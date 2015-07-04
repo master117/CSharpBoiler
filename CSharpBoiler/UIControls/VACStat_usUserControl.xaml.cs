@@ -25,18 +25,6 @@ namespace CSharpBoiler.UIControls
         public VACStat_usUserControl()
         {
             InitializeComponent();
-
-            if (Properties.Settings.Default.VACStat_usKey != "")
-            {
-                VacStat_usCheckBox.IsChecked = true;
-                ApikeyDockPanel.Visibility = Visibility.Collapsed;
-                ListsDockPanel.Visibility = Visibility.Visible;
-            }
-        }
-
-        public bool IsChecked()
-        {
-            return VacStat_usCheckBox.IsChecked == true;
         }
 
         private void VacStat_usCheckBox_OnChecked(object sender, RoutedEventArgs e)
@@ -50,24 +38,36 @@ namespace CSharpBoiler.UIControls
             ApikeyDockPanel.Visibility = Visibility.Collapsed;
             ListsDockPanel.Visibility = Visibility.Collapsed;
             Properties.Settings.Default.VACStat_usKey = "";
+            Properties.Settings.Default.VACStat_usListId = 0;
         }
 
         private void GetListsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            VAC_Stats_usListComboBox.ItemsSource = VACStat_usSender.GetLists(Properties.Settings.Default.VACStat_usKey);
+            VAC_Stats_usListComboBox.ItemsSource = VACStat_usSender.GetListsAsDictionary(Properties.Settings.Default.VACStat_usKey);
             VAC_Stats_usListComboBox.SelectedIndex = 0;
 
-            ApikeyDockPanel.Visibility = Visibility.Collapsed;
-            ListsDockPanel.Visibility = Visibility.Visible;
+            if (VAC_Stats_usListComboBox.Items.Count > 0)
+            {
+                ApikeyDockPanel.Visibility = Visibility.Collapsed;
+                ListsDockPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MessageBox.Show(
+                    "There seems to be a problem obtaining the lists of this User or the APIKEY is wrong. " +
+                    "Make sure that you have created at least one(1) list on VacStat.us and the APIKEY is correct.");
+            }
         }
 
         private void ChooseListButton_OnClick(object sender, RoutedEventArgs e)
         {
-            int selectedIndex = VAC_Stats_usListComboBox.SelectedIndex;
-            Dictionary<int, string> listDictionary = (Dictionary<int, string>) VAC_Stats_usListComboBox.ItemsSource;
+            //APIKEY was entered and List was selected, upload all steamIds to this List.
+            int selectedIndex = VAC_Stats_usListComboBox.SelectedIndex;         
 
-            if (selectedIndex >= 0 && selectedIndex < listDictionary.Count)
+            if (selectedIndex >= 0)
             {
+                Dictionary<int, string> listDictionary = (Dictionary<int, string>)VAC_Stats_usListComboBox.ItemsSource;
+
                 ListsDockPanel.Visibility = Visibility.Collapsed;
 
                 Properties.Settings.Default.VACStat_usListId = listDictionary.ElementAt(selectedIndex).Key;

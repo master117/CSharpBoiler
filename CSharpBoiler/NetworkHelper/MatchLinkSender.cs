@@ -14,11 +14,12 @@ using CSharpBoiler.Properties;
 
 namespace CSharpBoiler.NetworkHelper
 {
-    class MatchLinkSender
+    static class MatchLinkSender
     {
-        public List<UploadedDemoData> uploadedDemoDataList = new List<UploadedDemoData>();
+        private static bool initialized = false;
+        public static List<UploadedDemoData> uploadedDemoDataList = new List<UploadedDemoData>();
 
-        private const string APIURI = "http://localhost:61663/api/MatchLink?"; //"Http://www.boiler-stats.com/api/MatchLink?";
+        private const string APIURI = "http://www.boiler-stats.com/api/MatchLink?"; //"http://localhost:61663/api/MatchLink?"; //"http://www.boiler-stats.com/api/MatchLink?";
         private const string APIMatchLink = "DemoUrl=";
         private const string APIMatchDate = "MatchDate=";
         private const string APIEvent = "Event=";
@@ -26,9 +27,9 @@ namespace CSharpBoiler.NetworkHelper
 
         private const string filename = "UploadedDemoData.xml";
 
-        public MatchLinkSender(SteamKit2.GC.CSGO.Internal.CMsgGCCStrike15_v2_MatchList mainMatchList)
+        internal static void Initialize(SteamKit2.GC.CSGO.Internal.CMsgGCCStrike15_v2_MatchList mainMatchList)
         {
-            DeSerializeDemoData();
+            DeSerializeUploadedDemoData();
 
             foreach (var match in mainMatchList.matches)
             {
@@ -40,13 +41,21 @@ namespace CSharpBoiler.NetworkHelper
                 uploadedDemoData.matchDate = Convert.ToString(match.matchtime);
                 uploadedDemoData.eventString = "";
 
+                if(((DateTime.Now - TimeHelper.UnixTimeStampInSecondsToDateTime(match.matchtime)).TotalDays > 27))
+                    uploadedDemoData.isSend = true;
+
                 uploadedDemoDataList.Add(uploadedDemoData);
             }
+
+            initialized = true;
         }
 
         //Uploads MatchLink to Server, return the Number of successfully uploaded MatchLinks
-        internal int Send()
+        internal static int Send()
         {
+            if (!initialized)
+                return 0;
+
             int uploadedMatchLinksCounter = 0;
 
             using (WebClient client = new WebClient())
@@ -69,7 +78,6 @@ namespace CSharpBoiler.NetworkHelper
 
                         var a = client.ResponseHeaders[client.ResponseHeaders.Count - 1];
                         string result = System.Text.Encoding.UTF8.GetString(response);
-
                         Console.WriteLine(result);
 
                         demoData.isSend = true;
@@ -89,12 +97,12 @@ namespace CSharpBoiler.NetworkHelper
                 }
             }
 
-            SerializeDemoData();
+            SerializeUploadedDemoData();
 
             return uploadedMatchLinksCounter;
         }
 
-        private void DeSerializeDemoData()
+        private static void DeSerializeUploadedDemoData()
         {
             if (File.Exists(filename))
             {
@@ -110,27 +118,25 @@ namespace CSharpBoiler.NetworkHelper
                     streamReader.Close();
                 }
                 catch (Exception)
-                {
-                    
+                {                   
                     throw;
                 }
             }
         }
 
-        private void SerializeDemoData()
+        private static void SerializeUploadedDemoData()
         {
             try
             {
                 XmlSerializer xmlWriter = new XmlSerializer(typeof (List<UploadedDemoData>));
 
-                StreamWriter additionalDemoDataStreamWriter = new StreamWriter(filename);
+                StreamWriter streamWriter = new StreamWriter(filename);
 
-                xmlWriter.Serialize(additionalDemoDataStreamWriter, uploadedDemoDataList);
-                additionalDemoDataStreamWriter.Close();
+                xmlWriter.Serialize(streamWriter, uploadedDemoDataList);
+                streamWriter.Close();
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

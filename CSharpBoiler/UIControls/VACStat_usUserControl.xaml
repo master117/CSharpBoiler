@@ -6,9 +6,9 @@
              xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:properties="clr-namespace:CSharpBoiler.Properties"
              mc:Ignorable="d">
-    <Grid>
-        <DockPanel VerticalAlignment="Center" Visibility="Hidden">
-            <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="26" FontSize="14" />
+    <Grid Height="26">
+        <DockPanel VerticalAlignment="Center">
+            <CheckBox Name="VacStat_usCheckBox" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=UploadToVacStats_us, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Unchecked="VacStat_usCheckBox_OnUnchecked" Checked="VacStat_usCheckBox_OnChecked" Content="Add SteamIDs to VACStat.us" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="14" />
             <DockPanel Margin="5,0" Name="ApikeyDockPanel" Visibility="Collapsed">
                 <toolkit:WatermarkTextBox Name="VAC_Stats_usAPIKEYTextBox" Watermark="API Key, see VACStats for more Info" Text="{Binding Source={x:Static properties:Settings.Default}, Path=VACStat_usKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Left" Height="26" Width="230" FontSize="14" />
                 <Button Name="ExplanationButton" Content="?" Margin="5,0" BorderThickness="0" BorderBrush="Transparent" Background="Transparent" Foreground="White" FontWeight="Bold" FontSize="18"  Click="ExplanationButton_OnClick"></Button>

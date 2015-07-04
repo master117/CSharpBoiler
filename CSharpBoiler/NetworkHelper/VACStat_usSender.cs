@@ -17,32 +17,28 @@ namespace CSharpBoiler.NetworkHelper
     static class VACStat_usSender
     {
         private static bool initialized = false;
-        private static HashSet<string> steamIdsHashSet;
+        private static HashSet<long> steamIdsHashSet;
 
         private const string APIURI = "http://vacstat.us/api/v1/";
         private const string APIURIGETLISTS = "list?_key=";
         private const string APIADDMANY = "list/add/many";
 
         //VACStat.us WebApi only supports ~100 steamids per request
-        const int numberOfIDsPerRequest = 80;
+        const int NumberOfIDsPerRequest = 80;
 
-        internal static void Initialize(HashSet<string> tempSteamIdsList)
+        internal static void Initialize(HashSet<long> tempSteamIdsList)
         {
-            steamIdsHashSet = tempSteamIdsList;
-            initialized = true;
+            steamIdsHashSet = tempSteamIdsList;          
 
-            if (!String.IsNullOrEmpty(Properties.Settings.Default.VACStat_usKey) && Properties.Settings.Default.VACStat_usListId != 0)
-            {
+            //TODO: decide if outsend really should be a part of initialize, 
+            //i guess it shouldn't, but that would mean i have to autostartn upload in a different way
+            if (Properties.Settings.Default.UploadToVacStats_us && !String.IsNullOrEmpty(Properties.Settings.Default.VACStat_usKey) && Properties.Settings.Default.VACStat_usListId != 0)
                 Send(Properties.Settings.Default.VACStat_usKey, Properties.Settings.Default.VACStat_usListId);
-            }
-            else
-            {
-                Properties.Settings.Default.VACStat_usKey = "";
-                Properties.Settings.Default.VACStat_usListId = 0;
-            }
+
+            initialized = true;
         }
 
-        public static Dictionary<int, string> GetLists(string APIKey)
+        public static Dictionary<int, string> GetListsAsDictionary(string APIKey)
         {
             if (!initialized)
                 return null;
@@ -98,19 +94,19 @@ namespace CSharpBoiler.NetworkHelper
             {
                 try
                 {
-                    int numberOfRuns = (int)Math.Ceiling((double)steamIdsHashSet.Count / (double)numberOfIDsPerRequest);
+                    int numberOfRuns = (int)Math.Ceiling((double)steamIdsHashSet.Count / (double)NumberOfIDsPerRequest);
 
                     for (int i = 0; i < numberOfRuns; i++)
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.Append(APIURI + APIADDMANY + "?_key=" + APIKey + "&list_id=" + listId.ToString() + "&search=");
 
-                        for (int j = 0; j < numberOfIDsPerRequest; j++)
+                        for (int j = 0; j < NumberOfIDsPerRequest; j++)
                         {
-                            if (steamIdsHashSet.Count <= i * numberOfIDsPerRequest + j)
+                            if (steamIdsHashSet.Count <= i * NumberOfIDsPerRequest + j)
                                 break;
 
-                            sb.Append(steamIdsHashSet.ElementAt(i * numberOfIDsPerRequest + j) + ",");
+                            sb.Append(steamIdsHashSet.ElementAt(i * NumberOfIDsPerRequest + j) + ",");
                         }
                         sb.Remove(sb.Length - 1, 1);
 

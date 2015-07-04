@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" >
-    <Grid>
-        <StackPanel>
-            <CheckBox Name="AutoStartCheckBox" Unchecked="AutoStartCheckBox_OnUnchecked" Checked="AutoStartCheckBox_OnChecked" Content="Autostart CSharpBoiler after CSGO closes" Foreground="White" FontSize="14" />
+    <Grid Height="26">
+        <StackPanel VerticalAlignment="Center">
+            <CheckBox Name="AutoStartCheckBox" Unchecked="AutoStartCheckBox_OnUnchecked" Checked="AutoStartCheckBox_OnChecked" Content="Autostart CSharpBoiler after CSGO closes" Foreground="White" FontSize="14" VerticalContentAlignment="Center" />
         </StackPanel>
             
     </Grid>

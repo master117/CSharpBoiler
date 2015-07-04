@@ -129,4 +129,7 @@
   <data name="VACStat_usSender_Send_Removed_APIKey_and_ListId_to_ensure_security_and_stability_" xml:space="preserve">
     <value>Removed APIKey and ListId to ensure security and stability.</value>
   </data>
+  <data name="VacWatch_nlSender_Send_Problem_with_VacWatch_nl" xml:space="preserve">
+    <value> - Problem with VacWatch.nl</value>
+  </data>
 </root>

@@ -146,12 +146,17 @@ namespace CSharpBoiler
             Thread uploadThread = new Thread(uploadThreadStart);
             uploadThread.Start();
 
-            //Initializing VACStat_us Control
-            HashSet<string> steamIdsHashSet = new HashSet<string>();
+            //Creating a HashSet of all SteamIds
+            HashSet<long> steamIdsHashSet = new HashSet<long>();
             foreach (var cDataGccStrike15V2MatchInfo in mainMatchList.matches)
                 foreach (var accountId in cDataGccStrike15V2MatchInfo.roundstats.reservation.account_ids)
-                    steamIdsHashSet.Add((accountId + VOLVOMAGICNUMBER).ToString());
+                    steamIdsHashSet.Add((accountId + VOLVOMAGICNUMBER));
+
+            //Initializing VACStat_us Control
             VACStat_usSender.Initialize(steamIdsHashSet);
+
+            //Initializing VacWatch_nl Control
+            VacWatch_nlSender.Initialize(steamIdsHashSet, _accountId + VOLVOMAGICNUMBER);
         }
 
         private void DeserializeMatchData()
@@ -277,8 +282,8 @@ namespace CSharpBoiler
             //
             try
             {
-                MatchLinkSender matchLinkSender = new MatchLinkSender(mainMatchList);
-                int uploadedMatchLinks = matchLinkSender.Send();
+                MatchLinkSender.Initialize(mainMatchList);
+                int uploadedMatchLinks = MatchLinkSender.Send();
 
                 Application.Current.Dispatcher.Invoke(
                     new Action(() => { UploadedMatchLinksUserControlInstance.SetUploadedMatchLinksCount(uploadedMatchLinks, mainMatchList.matches.Count); }));
