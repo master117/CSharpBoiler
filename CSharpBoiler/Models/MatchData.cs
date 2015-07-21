@@ -74,58 +74,6 @@ namespace CSharpBoiler.Models
                 OnPropertyChanged(new PropertyChangedEventArgs("Commented"));
             }
         }
-        public int _K3 { get; set; }
-        public int K3
-        {
-            get { return _K3; }
-            set
-            {
-                _K3 = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("K3"));
-            }
-        }
-        public int _K4 { get; set; }
-        public int K4
-        {
-            get { return _K4; }
-            set
-            {
-                _K4 = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("K4"));
-            }
-        }
-        public int _K5 { get; set; }
-        public int K5
-        {
-            get { return _K5; }
-            set
-            {
-                _K5 = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("K5"));
-            }
-        }
-        public int _HS { get; set; }
-        public int HS
-        {
-            get { return _HS; }
-            set
-            {
-                _HS = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("HS"));
-            }
-        }
-        public int _AnalysisProgress { get; set; }
-        public int AnalysisProgress
-        {
-            get { return _AnalysisProgress; }
-            set
-            {
-                _AnalysisProgress = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("AnalysisProgress"));
-            }
-        }
-
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="CSharpBoiler.UIControls.VacWatch_nlUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:properties="clr-namespace:CSharpBoiler.Properties"
+             mc:Ignorable="d" >
+    <Grid Height="26">
+        <CheckBox Name="UploadToVacWatchCheckBox" Content="Upload SteamIds to VacWatch.nl" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=UploadToVacWatch_nl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="UploadToVacWatchCheckBox_OnChecked" Foreground="White" FontSize="14" VerticalContentAlignment="Center" />  
+    </Grid>
+</UserControl>

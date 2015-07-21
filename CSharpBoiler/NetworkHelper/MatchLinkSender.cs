@@ -19,7 +19,7 @@ namespace CSharpBoiler.NetworkHelper
         private static bool initialized = false;
         public static List<UploadedDemoData> uploadedDemoDataList = new List<UploadedDemoData>();
 
-        private const string APIURI = "http://www.boiler-stats.com/api/MatchLink?"; //"http://localhost:61663/api/MatchLink?"; //"http://www.boiler-stats.com/api/MatchLink?";
+        private const string APIURI = "http://localhost:61663/api/MatchLink?"; //"http://www.boiler-stats.com/api/MatchLink?";
         private const string APIMatchLink = "DemoUrl=";
         private const string APIMatchDate = "MatchDate=";
         private const string APIEvent = "Event=";
